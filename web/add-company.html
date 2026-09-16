@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add New Company Opening - Smart Job Finder Admin</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="admin-body">
+
+    <header class="app-header admin-header">
+        <div class="header-content">
+            <div class="logo-title">
+                <span class="logo-icon admin-icon">🛡️</span>
+                <div>
+                    <h1>Smart Job Finder</h1>
+                    <span class="badge-admin-tag">Administrator Console</span>
+                </div>
+            </div>
+            <div class="header-actions">
+                <a href="adminDashboard" class="btn btn-secondary btn-sm">← Back to Dashboard</a>
+                <a href="adminLogout" class="btn btn-outline btn-sm btn-logout">Sign Out</a>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-container admin-main" style="max-width: 860px;">
+        <div class="search-form-card" style="max-width: 100%; padding: 36px 40px; margin-top: 10px;">
+            <div class="search-header" style="text-align: left; border-bottom: 1px solid var(--border-color); padding-bottom: 20px; margin-bottom: 28px;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <h2 style="font-size: 26px; color: var(--text-main);">➕ Add New Company Opening</h2>
+                        <p style="color: var(--text-muted); font-size: 14px; margin-top: 4px;">Enter company details, compensation, technical stack, and select or upload a verified vector logo.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Alert banner -->
+            <div id="alertBanner" class="alert-banner"></div>
+
+            <form action="addCompany" method="post" enctype="multipart/form-data">
+                <div class="form-grid-2">
+                    <div class="form-group">
+                        <label for="company_name">Company Name *</label>
+                        <input type="text"
+                               id="company_name"
+                               name="company_name"
+                               class="form-control"
+                               placeholder="e.g. Flipkart, Myntra, Walmart, Google"
+                               required
+                               autofocus
+                               oninput="autoDetectLogo(this.value)">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="role">Target Job Role *</label>
+                        <input type="text"
+                               id="role"
+                               name="role"
+                               class="form-control"
+                               placeholder="e.g. Senior Software Engineer"
+                               required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="skillsInput">Required Technical Skills (Comma-separated) *</label>
+                    <input type="text"
+                           id="skillsInput"
+                           name="skills"
+                           class="form-control"
+                           placeholder="e.g. Java, Spring Boot, SQL, Python, Cloud, AWS"
+                           required>
+                    <div class="form-hint">Click below to quick-add tech stack:</div>
+                    <div class="chip-container">
+                        <span class="quick-chip" data-skill="Java">+ Java</span>
+                        <span class="quick-chip" data-skill="Spring Boot">+ Spring Boot</span>
+                        <span class="quick-chip" data-skill="SQL">+ SQL</span>
+                        <span class="quick-chip" data-skill="Python">+ Python</span>
+                        <span class="quick-chip" data-skill="React">+ React</span>
+                        <span class="quick-chip" data-skill="Cloud">+ Cloud</span>
+                        <span class="quick-chip" data-skill="AWS">+ AWS</span>
+                        <span class="quick-chip" data-skill="Microservices">+ Microservices</span>
+                        <span class="quick-chip" data-skill="Docker">+ Docker</span>
+                        <span class="quick-chip" data-skill="HTML">+ HTML</span>
+                        <span class="quick-chip" data-skill="JavaScript">+ JavaScript</span>
+                        <span class="quick-chip" data-skill="C++">+ C++</span>
+                    </div>
+                </div>
+
+                <div class="form-grid-2">
+                    <div class="form-group">
+                        <label for="salary">Annual Expected Salary (₹) *</label>
+                        <input type="number"
+                               id="salary"
+                               name="salary"
+                               class="form-control"
+                               min="100000"
+                               step="50000"
+                               placeholder="e.g. 1500000"
+                               required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="experience">Experience Bracket (Years)</label>
+                        <input type="text"
+                               id="experience"
+                               name="experience"
+                               class="form-control"
+                               placeholder="e.g. 0-2, 1-3, 2-5"
+                               value="0-2">
+                    </div>
+                </div>
+
+                <!-- Logo Management Section -->
+                <div class="form-group" style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 20px; margin-bottom: 22px;">
+                    <label style="font-weight: 700; color: #1e293b; font-size: 15px; margin-bottom: 12px; display: block;">🏢 Company Logo Selection &amp; Upload</label>
+                    <div style="display: flex; gap: 24px; align-items: center; flex-wrap: wrap;">
+                        <div style="text-align: center;">
+                            <img id="logoPreview" src="images/default-company.svg" alt="Selected Logo Preview" style="width: 68px; height: 68px; object-fit: contain; background: #ffffff; border: 1.5px solid #cbd5e1; border-radius: 12px; padding: 6px; display: block; box-shadow: 0 2px 4px rgba(0,0,0,0.05);" onerror="this.onerror=null;this.src='images/default-company.svg';">
+                            <span style="font-size: 11px; color: #64748b; margin-top: 6px; display: block; font-weight: 600;">Logo Preview</span>
+                        </div>
+                        <div style="flex: 1; min-width: 280px;">
+                            <label for="logoSelect" style="font-size: 12px; font-weight: 600; color: #475569; margin-bottom: 4px; display: block;">Select from Supported 110+ Company Logos:</label>
+                            <select id="logoSelect" class="form-control" style="margin-bottom: 12px;" onchange="onPresetSelected(this.value)">
+                                <option value="images/accenture.svg">Accenture (images/accenture.svg)</option>
+                                <option value="images/adobe.svg">Adobe (images/adobe.svg)</option>
+                                <option value="images/airbnb.svg">Airbnb (images/airbnb.svg)</option>
+                                <option value="images/amazon.svg">Amazon (images/amazon.svg)</option>
+                                <option value="images/amd.svg">AMD (images/amd.svg)</option>
+                                <option value="images/americanexpress.svg">American Express (AMEX) (images/americanexpress.svg)</option>
+                                <option value="images/apple.svg">Apple (images/apple.svg)</option>
+                                <option value="images/arm.svg">ARM (images/arm.svg)</option>
+                                <option value="images/atlassian.svg">Atlassian (images/atlassian.svg)</option>
+                                <option value="images/bain.svg">Bain & Company (images/bain.svg)</option>
+                                <option value="images/bankofamerica.svg">Bank of America (images/bankofamerica.svg)</option>
+                                <option value="images/barclays.svg">Barclays (images/barclays.svg)</option>
+                                <option value="images/bcg.svg">Boston Consulting Group (BCG) (images/bcg.svg)</option>
+                                <option value="images/bigbasket.svg">BigBasket (images/bigbasket.svg)</option>
+                                <option value="images/bnpparibas.svg">BNP Paribas (images/bnpparibas.svg)</option>
+                                <option value="images/booking.svg">Booking.com (images/booking.svg)</option>
+                                <option value="images/bosch.svg">Bosch (images/bosch.svg)</option>
+                                <option value="images/broadcom.svg">Broadcom (images/broadcom.svg)</option>
+                                <option value="images/capgemini.svg">Capgemini (images/capgemini.svg)</option>
+                                <option value="images/cisco.svg">Cisco (images/cisco.svg)</option>
+                                <option value="images/citi.svg">Citi (images/citi.svg)</option>
+                                <option value="images/cognizant.svg">Cognizant (images/cognizant.svg)</option>
+                                <option value="images/cred.svg">Cred (images/cred.svg)</option>
+                                <option value="images/databricks.svg">Databricks (images/databricks.svg)</option>
+                                <option value="images/default-company.svg" selected>🏢 Default Company Icon (images/default-company.svg)</option>
+                                <option value="images/dell.svg">Dell (images/dell.svg)</option>
+                                <option value="images/deloitte.svg">Deloitte (images/deloitte.svg)</option>
+                                <option value="images/deutschebank.svg">Deutsche Bank (images/deutschebank.svg)</option>
+                                <option value="images/dropbox.svg">Dropbox (images/dropbox.svg)</option>
+                                <option value="images/dxctechnology.svg">DXC Technology (images/dxctechnology.svg)</option>
+                                <option value="images/ebay.svg">Ebay (images/ebay.svg)</option>
+                                <option value="images/ericsson.svg">Ericsson (images/ericsson.svg)</option>
+                                <option value="images/ey.svg">Ernst & Young (EY) (images/ey.svg)</option>
+                                <option value="images/flipkart.svg">Flipkart (images/flipkart.svg)</option>
+                                <option value="images/freshworks.svg">Freshworks (images/freshworks.svg)</option>
+                                <option value="images/github.svg">Github (images/github.svg)</option>
+                                <option value="images/goldmansachs.svg">Goldman Sachs (images/goldmansachs.svg)</option>
+                                <option value="images/google.svg">Google (images/google.svg)</option>
+                                <option value="images/groww.svg">Groww (images/groww.svg)</option>
+                                <option value="images/hcltech.svg">HCLTech (images/hcltech.svg)</option>
+                                <option value="images/hexaware.svg">Hexaware (images/hexaware.svg)</option>
+                                <option value="images/honeywell.svg">Honeywell (images/honeywell.svg)</option>
+                                <option value="images/hp.svg">HP (images/hp.svg)</option>
+                                <option value="images/hsbc.svg">Hsbc (images/hsbc.svg)</option>
+                                <option value="images/ibm.svg">IBM (images/ibm.svg)</option>
+                                <option value="images/infosys.svg">Infosys (images/infosys.svg)</option>
+                                <option value="images/inmobi.svg">Inmobi (images/inmobi.svg)</option>
+                                <option value="images/intel.svg">Intel (images/intel.svg)</option>
+                                <option value="images/intuit.svg">Intuit (images/intuit.svg)</option>
+                                <option value="images/jpmorgan.svg">JPMorgan Chase (images/jpmorgan.svg)</option>
+                                <option value="images/kpmg.svg">KPMG (images/kpmg.svg)</option>
+                                <option value="images/lenovo.svg">Lenovo (images/lenovo.svg)</option>
+                                <option value="images/linkedin.svg">Linkedin (images/linkedin.svg)</option>
+                                <option value="images/ltimindtree.svg">LTIMindtree (images/ltimindtree.svg)</option>
+                                <option value="images/mastercard.svg">Mastercard (images/mastercard.svg)</option>
+                                <option value="images/mckinsey.svg">McKinsey & Company (images/mckinsey.svg)</option>
+                                <option value="images/meesho.svg">Meesho (images/meesho.svg)</option>
+                                <option value="images/meta.svg">Meta (images/meta.svg)</option>
+                                <option value="images/micron.svg">Micron (images/micron.svg)</option>
+                                <option value="images/microsoft.svg">Microsoft (images/microsoft.svg)</option>
+                                <option value="images/morganstanley.svg">Morgan Stanley (images/morganstanley.svg)</option>
+                                <option value="images/mphasis.svg">Mphasis (images/mphasis.svg)</option>
+                                <option value="images/myntra.svg">Myntra (images/myntra.svg)</option>
+                                <option value="images/netflix.svg">Netflix (images/netflix.svg)</option>
+                                <option value="images/nokia.svg">Nokia (images/nokia.svg)</option>
+                                <option value="images/nvidia.svg">Nvidia (images/nvidia.svg)</option>
+                                <option value="images/nykaa.svg">Nykaa (images/nykaa.svg)</option>
+                                <option value="images/ola.svg">Ola (images/ola.svg)</option>
+                                <option value="images/oracle.svg">Oracle (images/oracle.svg)</option>
+                                <option value="images/palantir.svg">Palantir (images/palantir.svg)</option>
+                                <option value="images/paypal.svg">Paypal (images/paypal.svg)</option>
+                                <option value="images/paytm.svg">Paytm (images/paytm.svg)</option>
+                                <option value="images/persistentsystems.svg">Persistentsystems (images/persistentsystems.svg)</option>
+                                <option value="images/philips.svg">Philips (images/philips.svg)</option>
+                                <option value="images/phonepe.svg">PhonePe (images/phonepe.svg)</option>
+                                <option value="images/pinterest.svg">Pinterest (images/pinterest.svg)</option>
+                                <option value="images/pwc.svg">PwC (PricewaterhouseCoopers) (images/pwc.svg)</option>
+                                <option value="images/qualcomm.svg">Qualcomm (images/qualcomm.svg)</option>
+                                <option value="images/razorpay.svg">Razorpay (images/razorpay.svg)</option>
+                                <option value="images/reddit.svg">Reddit (images/reddit.svg)</option>
+                                <option value="images/salesforce.svg">Salesforce (images/salesforce.svg)</option>
+                                <option value="images/samsung.svg">Samsung (images/samsung.svg)</option>
+                                <option value="images/sap.svg">SAP (images/sap.svg)</option>
+                                <option value="images/schneiderelectric.svg">Schneider Electric (images/schneiderelectric.svg)</option>
+                                <option value="images/servicenow.svg">ServiceNow (images/servicenow.svg)</option>
+                                <option value="images/siemens.svg">Siemens (images/siemens.svg)</option>
+                                <option value="images/snowflake.svg">Snowflake (images/snowflake.svg)</option>
+                                <option value="images/sony.svg">Sony (images/sony.svg)</option>
+                                <option value="images/spotify.svg">Spotify (images/spotify.svg)</option>
+                                <option value="images/standardchartered.svg">Standard Chartered (images/standardchartered.svg)</option>
+                                <option value="images/stripe.svg">Stripe (images/stripe.svg)</option>
+                                <option value="images/swiggy.svg">Swiggy (images/swiggy.svg)</option>
+                                <option value="images/tcs.svg">Tata Consultancy Services (TCS) (images/tcs.svg)</option>
+                                <option value="images/techmahindra.svg">Tech Mahindra (images/techmahindra.svg)</option>
+                                <option value="images/ti.svg">Texas Instruments (TI) (images/ti.svg)</option>
+                                <option value="images/twilio.svg">Twilio (images/twilio.svg)</option>
+                                <option value="images/twitter.svg">Twitter / X (images/twitter.svg)</option>
+                                <option value="images/uber.svg">Uber (images/uber.svg)</option>
+                                <option value="images/urbancompany.svg">Urban Company (images/urbancompany.svg)</option>
+                                <option value="images/visa.svg">Visa (images/visa.svg)</option>
+                                <option value="images/vmware.svg">VMware (images/vmware.svg)</option>
+                                <option value="images/walmart.svg">Walmart (images/walmart.svg)</option>
+                                <option value="images/walmartglobaltech.svg">Walmart Global Tech (images/walmartglobaltech.svg)</option>
+                                <option value="images/wellsfargo.svg">Wells Fargo (images/wellsfargo.svg)</option>
+                                <option value="images/westerndigital.svg">Western Digital (images/westerndigital.svg)</option>
+                                <option value="images/wipro.svg">Wipro (images/wipro.svg)</option>
+                                <option value="images/workday.svg">Workday (images/workday.svg)</option>
+                                <option value="images/zepto.svg">Zepto (images/zepto.svg)</option>
+                                <option value="images/zerodha.svg">Zerodha (images/zerodha.svg)</option>
+                                <option value="images/zoho.svg">Zoho (images/zoho.svg)</option>
+                                <option value="images/zomato.svg">Zomato (images/zomato.svg)</option>
+                            </select>
+                            <div style="display: flex; gap: 14px; flex-wrap: wrap;">
+                                <div style="flex: 1; min-width: 180px;">
+                                    <label for="logoFile" style="font-size: 12px; font-weight: 600; color: #475569; margin-bottom: 4px; display: block;">Or Upload Custom Logo (.svg, .png, .jpg):</label>
+                                    <input type="file" id="logoFile" name="logo_file" accept=".svg,.png,.jpg,.jpeg,.webp" class="form-control" onchange="onFileUploaded(this)">
+                                </div>
+                                <div style="flex: 1; min-width: 180px;">
+                                    <label for="logo" style="font-size: 12px; font-weight: 600; color: #475569; margin-bottom: 4px; display: block;">Saved Logo Path:</label>
+                                    <input type="text" id="logo" name="logo" class="form-control" value="images/default-company.svg" oninput="updateLogoPreview(this.value)">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-grid-2">
+                    <div class="form-group">
+                        <label for="status">Company Visibility Status *</label>
+                        <select id="status" name="status" class="form-control" style="font-weight: 600;">
+                            <option value="ACTIVE" selected>🟢 Active (Visible to Job Seekers)</option>
+                            <option value="INACTIVE">⏸️ Inactive (Hidden from Job Seekers)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="apply_url">Application Portal / Career Link</label>
+                        <input type="text"
+                               id="apply_url"
+                               name="apply_url"
+                               class="form-control"
+                               placeholder="https://careers.company.com/jobs">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="description">Job Description / Overview</label>
+                    <textarea id="description"
+                              name="description"
+                              class="form-control"
+                              rows="3"
+                              placeholder="Brief summary of responsibilities, mission, and ideal tech stack experience..."></textarea>
+                </div>
+
+                <div style="display: flex; gap: 14px; margin-top: 24px;">
+                    <button type="submit" class="btn btn-primary btn-lg" style="flex: 2;">
+                        ➕ Create &amp; Publish Company Opening
+                    </button>
+                    <a href="adminDashboard" class="btn btn-secondary btn-lg" style="flex: 1; text-align: center;">
+                        Cancel
+                    </a>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <script src="js/script.js"></script>
+    <script>
+        function updateLogoPreview(path) {
+            if (!path || !path.trim()) path = 'images/default-company.svg';
+            document.getElementById('logoPreview').src = path;
+        }
+
+        function onPresetSelected(val) {
+            document.getElementById('logo').value = val;
+            updateLogoPreview(val);
+        }
+
+        function onFileUploaded(input) {
+            if (input.files && input.files[0]) {
+                const file = input.files[0];
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('logoPreview').src = e.target.result;
+                    document.getElementById('logo').value = 'images/' + file.name;
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function autoDetectLogo(name) {
+            if (!name) return;
+            const slug = name.toLowerCase().replace(/[^a-z0-9]/g, '');
+            if (slug.length < 2) return;
+            const fileInput = document.getElementById('logoFile');
+            if (fileInput && fileInput.files && fileInput.files.length > 0) return;
+            const sel = document.getElementById('logoSelect');
+
+            // 1. Exact match with logo filename slug
+            for (let i = 0; i < sel.options.length; i++) {
+                const optVal = sel.options[i].value.toLowerCase().replace('images/', '').replace('.svg', '').replace(/[^a-z0-9]/g, '');
+                if (optVal === slug) {
+                    sel.selectedIndex = i;
+                    onPresetSelected(sel.options[i].value);
+                    return;
+                }
+            }
+
+            // 2. Exact word match
+            const words = name.toLowerCase().split(/[^a-z0-9]+/);
+            for (let w of words) {
+                if (w.length >= 2) {
+                    for (let i = 0; i < sel.options.length; i++) {
+                        const optVal = sel.options[i].value.toLowerCase().replace('images/', '').replace('.svg', '').replace(/[^a-z0-9]/g, '');
+                        if (optVal === w) {
+                            sel.selectedIndex = i;
+                            onPresetSelected(sel.options[i].value);
+                            return;
+                        }
+                    }
+                }
+            }
+
+            // 3. Substring only for slugs with at least 4 characters
+            if (slug.length >= 4) {
+                for (let i = 0; i < sel.options.length; i++) {
+                    const optVal = sel.options[i].value.toLowerCase().replace('images/', '').replace('.svg', '').replace(/[^a-z0-9]/g, '');
+                    if (optVal.length >= 4 && (slug.includes(optVal) || optVal.includes(slug))) {
+                        sel.selectedIndex = i;
+                        onPresetSelected(sel.options[i].value);
+                        return;
+                    }
+                }
+            }
+        }
+    </script>
+</body>
+</html>

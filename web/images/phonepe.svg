@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 60" width="100%" height="100%">
+  <rect width="60" height="60" rx="12" fill="#5F259F"/>
+  <circle cx="30" cy="30" r="16" fill="#6739B7"/>
+  <text x="30" y="38" font-family="Arial, sans-serif" font-size="20" font-weight="900" fill="#FFFFFF" text-anchor="middle">पे</text>
+</svg>

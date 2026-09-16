@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 60" width="100%" height="100%">
+  <rect width="60" height="60" rx="12" fill="#2D2D2D"/>
+  <rect x="18" y="16" width="8" height="8" fill="#DC3545"/>
+  <rect x="26" y="16" width="8" height="8" fill="#FD7E14"/>
+  <rect x="34" y="16" width="8" height="8" fill="#FFC107"/>
+  <rect x="18" y="24" width="8" height="8" fill="#E83E8C"/>
+  <text x="30" y="46" font-family="Georgia, serif" font-size="15" font-weight="700" fill="#FFFFFF" text-anchor="middle">pwc</text>
+</svg>

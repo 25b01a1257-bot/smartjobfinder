@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Find Matching Jobs - Smart Job Finder</title>
+    <link rel="stylesheet" href="css/style.css?v=20260916_v4">
+</head>
+<body>
+
+    <header class="app-header">
+        <div class="header-content">
+            <a href="index.html" class="logo-title">
+                <span class="logo-icon">⚡</span>
+                <h1>Smart Job Finder</h1>
+            </a>
+            <div class="header-actions">
+                <a href="job-search.html" class="btn btn-secondary btn-sm">Refresh Search</a>
+                <a href="login.html" class="btn btn-outline btn-sm">Sign Out</a>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-container">
+        <!-- Search & Skill Selection Card -->
+        <div class="search-form-card" style="max-width: 880px; margin-bottom: 30px;">
+            <div class="search-header">
+                <div style="display:inline-flex; align-items:center; gap:6px; margin-bottom:12px; background:linear-gradient(135deg, #eef2ff 0%, #ede9fe 100%); color:#4f46e5; border:1px solid #c7d2fe; font-size:12px; font-weight:700; padding:4px 12px; border-radius:9999px;">
+                    ✨ AI Match Score &amp; Dynamic Skill Matching Enabled
+                </div>
+                <h2>Discover Your Dream Career Opportunity</h2>
+                <p>Select or type your skills to see matching company openings update in real-time.</p>
+            </div>
+
+            <form id="jobSearchForm" action="findJobs" method="post">
+                <!-- Hidden input synced with Selected Skills array for form submission -->
+                <input type="hidden" id="skillsInput" name="skills" value="">
+
+                <!-- 1. Skill Search & Autocomplete Input with Prominent [+ Add Skill] Button -->
+                <div class="skill-input-wrapper">
+                    <label for="skillSearchInput" style="display: block; font-size: 13px; font-weight: 700; color: var(--secondary); margin-bottom: 8px;">
+                        🔍 Search or Type Technical Skills
+                    </label>
+                    <div class="skill-input-row">
+                        <div class="skill-input-box-wrap">
+                            <span class="skill-input-icon">⚡</span>
+                            <input type="text"
+                                   id="skillSearchInput"
+                                   class="skill-search-input"
+                                   placeholder="Type a skill (e.g. Java, Python, SQL, React, Power BI, AWS)..."
+                                   autocomplete="off">
+                            <!-- Autocomplete suggestion dropdown -->
+                            <div id="skillSuggestionsDropdown" class="skill-suggestions-dropdown"></div>
+                        </div>
+                        <button type="button" id="btnAddSkill" class="btn btn-add-skill" onclick="handleAddSkillFromInput(event)">
+                            ➕ Add Skill
+                        </button>
+                    </div>
+                    <div id="skillInputFeedback" class="skill-input-feedback" style="display: none;"></div>
+                    <div style="font-size: 12px; color: var(--text-muted); margin-top: 8px;">
+                        💡 <em>Select from autocomplete suggestions, or click <strong>+ Add Skill</strong> / press <kbd>Enter</kbd> to add any custom skill.</em>
+                    </div>
+                </div>
+
+                <!-- 2. Selected Skills Tag Area with (×) Remove Buttons -->
+                <div id="selectedSkillsWrapper" class="selected-skills-wrapper">
+                    <div class="selected-skills-header">
+                        <div class="selected-skills-title">
+                            <span>Selected Skills</span>
+                            <span id="skillsCountPill" class="skills-count-pill">0</span>
+                        </div>
+                        <button type="button" id="btnClearSkills" class="btn-clear-skills" style="display: none;" onclick="clearAllSkills(event)">
+                            ✕ Clear All Skills
+                        </button>
+                    </div>
+                    <div id="selectedSkillsList" class="selected-skills-list">
+                        <span class="selected-skills-empty">No skills selected yet. Click skills below or type above to add.</span>
+                    </div>
+                </div>
+
+                <!-- 3. Categorized Quick-Add Chips -->
+                <div class="quick-skills-section">
+                    <div style="font-size: 12px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px;">
+                        Popular In-Demand Skills (Click to Quick-Add):
+                    </div>
+                    <div class="quick-category-tabs">
+                        <button type="button" class="quick-cat-btn active" data-cat="all">All Skills</button>
+                        <button type="button" class="quick-cat-btn" data-cat="Languages">Core Languages</button>
+                        <button type="button" class="quick-cat-btn" data-cat="Frontend">Web &amp; Frontend</button>
+                        <button type="button" class="quick-cat-btn" data-cat="Backend">Backend &amp; Cloud</button>
+                        <button type="button" class="quick-cat-btn" data-cat="Data">Data &amp; AI</button>
+                    </div>
+
+                    <div class="quick-chips-grid">
+                        <!-- Languages -->
+                        <span class="quick-chip" data-skill="Java" data-category="Languages" onclick="handleQuickChipClick(this, event)">+ Java</span>
+                        <span class="quick-chip" data-skill="Python" data-category="Languages" onclick="handleQuickChipClick(this, event)">+ Python</span>
+                        <span class="quick-chip" data-skill="C" data-category="Languages" onclick="handleQuickChipClick(this, event)">+ C</span>
+                        <span class="quick-chip" data-skill="C++" data-category="Languages" onclick="handleQuickChipClick(this, event)">+ C++</span>
+                        <span class="quick-chip" data-skill="JavaScript" data-category="Languages" onclick="handleQuickChipClick(this, event)">+ JavaScript</span>
+                        <span class="quick-chip" data-skill="TypeScript" data-category="Languages" onclick="handleQuickChipClick(this, event)">+ TypeScript</span>
+                        <span class="quick-chip" data-skill="SQL" data-category="Languages" onclick="handleQuickChipClick(this, event)">+ SQL</span>
+                        <span class="quick-chip" data-skill="HTML" data-category="Languages" onclick="handleQuickChipClick(this, event)">+ HTML</span>
+                        <span class="quick-chip" data-skill="CSS" data-category="Languages" onclick="handleQuickChipClick(this, event)">+ CSS</span>
+
+                        <!-- Web & Frontend -->
+                        <span class="quick-chip" data-skill="React" data-category="Frontend" onclick="handleQuickChipClick(this, event)">+ React</span>
+                        <span class="quick-chip" data-skill="Node.js" data-category="Frontend" onclick="handleQuickChipClick(this, event)">+ Node.js</span>
+                        <span class="quick-chip" data-skill="Angular" data-category="Frontend" onclick="handleQuickChipClick(this, event)">+ Angular</span>
+                        <span class="quick-chip" data-skill="Redux" data-category="Frontend" onclick="handleQuickChipClick(this, event)">+ Redux</span>
+
+                        <!-- Backend & Cloud -->
+                        <span class="quick-chip" data-skill="Spring Boot" data-category="Backend" onclick="handleQuickChipClick(this, event)">+ Spring Boot</span>
+                        <span class="quick-chip" data-skill="Microservices" data-category="Backend" onclick="handleQuickChipClick(this, event)">+ Microservices</span>
+                        <span class="quick-chip" data-skill="AWS" data-category="Backend" onclick="handleQuickChipClick(this, event)">+ AWS</span>
+                        <span class="quick-chip" data-skill="Docker" data-category="Backend" onclick="handleQuickChipClick(this, event)">+ Docker</span>
+                        <span class="quick-chip" data-skill="Kubernetes" data-category="Backend" onclick="handleQuickChipClick(this, event)">+ Kubernetes</span>
+                        <span class="quick-chip" data-skill="Cloud" data-category="Backend" onclick="handleQuickChipClick(this, event)">+ Cloud</span>
+                        <span class="quick-chip" data-skill="Kafka" data-category="Backend" onclick="handleQuickChipClick(this, event)">+ Kafka</span>
+                        <span class="quick-chip" data-skill="MySQL" data-category="Backend" onclick="handleQuickChipClick(this, event)">+ MySQL</span>
+
+                        <!-- Data & Analytics -->
+                        <span class="quick-chip" data-skill="Excel" data-category="Data" onclick="handleQuickChipClick(this, event)">+ Excel</span>
+                        <span class="quick-chip" data-skill="Power BI" data-category="Data" onclick="handleQuickChipClick(this, event)">+ Power BI</span>
+                        <span class="quick-chip" data-skill="Tableau" data-category="Data" onclick="handleQuickChipClick(this, event)">+ Tableau</span>
+                        <span class="quick-chip" data-skill="Pandas" data-category="Data" onclick="handleQuickChipClick(this, event)">+ Pandas</span>
+                        <span class="quick-chip" data-skill="Machine Learning" data-category="Data" onclick="handleQuickChipClick(this, event)">+ Machine Learning</span>
+                        <span class="quick-chip" data-skill="Data Structures" data-category="Data" onclick="handleQuickChipClick(this, event)">+ DSA</span>
+                    </div>
+                </div>
+
+                <!-- 4. Target Role & Compensation Preferences -->
+                <div style="margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--border-color);">
+                    <div class="form-group">
+                        <label for="role">Target Role / Title (Optional Keyword Filter)</label>
+                        <input type="text"
+                               id="role"
+                               name="role"
+                               class="form-control"
+                               placeholder="e.g. Software Engineer, Data Analyst, Technology Analyst">
+                    </div>
+
+                    <div class="form-grid-2">
+                        <div class="form-group">
+                            <label for="experience">Experience Level (Years)</label>
+                            <input type="number"
+                                   id="experience"
+                                   name="experience"
+                                   class="form-control"
+                                   min="0"
+                                   max="30"
+                                   placeholder="e.g. 1"
+                                   value="1">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="salary">Expected Annual Salary (₹)</label>
+                            <input type="number"
+                                   id="salary"
+                                   name="salary"
+                                   class="form-control"
+                                   min="100000"
+                                   step="50000"
+                                   placeholder="e.g. 800000"
+                                   value="800000">
+                        </div>
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 14px; margin-top: 20px; flex-wrap: wrap;">
+                    <button type="submit" class="btn btn-primary btn-lg" style="flex: 2; min-width: 240px;">
+                        🔍 View Dedicated Full Results Page →
+                    </button>
+                    <button type="button" onclick="clearAllSkills()" class="btn btn-outline btn-lg" style="flex: 1; min-width: 140px;">
+                        Reset Filters
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- 5. Dynamic Real-time Matching Jobs Section -->
+        <section id="dynamicResultsSection" class="dynamic-results-container">
+            <div id="resultsStatusBanner" class="results-status-banner">
+                <div class="results-status-text">
+                    <h3 id="matchingJobsCounter">⚡ Matching Opportunities</h3>
+                    <p id="matchingJobsSubtitle">Jobs matching your selected skills are displayed and prioritized in real-time.</p>
+                </div>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <span style="font-size: 12px; font-weight: 700; color: #059669; background: #ecfdf5; border: 1px solid #a7f3d0; padding: 4px 10px; border-radius: 9999px;">
+                        ● Live Synchronized
+                    </span>
+                </div>
+            </div>
+
+            <!-- Loading Spinner -->
+            <div id="resultsLoading" class="results-loading-state" style="display: none;">
+                <div class="results-loading-spinner"></div>
+                <p>Matching your skills with 110+ company openings...</p>
+            </div>
+
+            <!-- Dynamic Job Cards Grid -->
+            <div id="dynamicJobsGrid" class="job-cards-grid"></div>
+
+            <!-- Empty State when 0 jobs match -->
+            <div id="noMatchesCard" class="no-results-card" style="display: none;">
+                <div class="empty-icon">🔍</div>
+                <h3>No Matching Companies Found</h3>
+                <p id="noMatchesQueryText">We couldn't find openings matching your specific skill combination.</p>
+                <div style="font-size: 13px; color: var(--text-muted); margin-bottom: 20px;">
+                    💡 <strong>Tips to discover matches:</strong>
+                    <ul style="list-style: none; padding: 0; margin-top: 8px; line-height: 1.8;">
+                        <li>• Try removing more specific skills using the <strong>×</strong> button</li>
+                        <li>• Add high-demand complementary skills like <em>Java, Python, SQL, React, or Cloud</em></li>
+                        <li>• Check whether your target role filter is too restrictive</li>
+                    </ul>
+                </div>
+                <div class="empty-actions">
+                    <button type="button" onclick="clearAllSkills()" class="btn btn-primary">Clear Skills &amp; View All Openings</button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Interactive AI Career Intelligence Modal Markup -->
+    <div id="aiSkillModalOverlay" class="ai-modal-overlay" style="display: none;">
+        <div class="ai-modal-card" role="dialog" aria-modal="true">
+            <button type="button" class="ai-modal-close" onclick="closeAiSkillModal()" title="Close (Esc)">✕</button>
+            <div class="ai-modal-header">
+                <div class="ai-modal-logo-wrap">
+                    <img id="modalCompanyLogo" src="images/default-company.svg" alt="Company Logo" class="ai-modal-logo">
+                </div>
+                <div class="ai-modal-header-text">
+                    <h3 id="modalCompanyName">Company Name</h3>
+                    <p id="modalCompanyRole">Job Role</p>
+                    <div class="ai-modal-meta-row">
+                        <span id="modalMetaExp" class="meta-item">💼 Exp</span>
+                        <span id="modalMetaSalary" class="meta-item">💰 Salary</span>
+                        <span id="modalRoleFitBadge" class="role-fit-badge">🎯 Strong Fit</span>
+                    </div>
+                </div>
+                <div class="ai-modal-score-wrap">
+                    <div id="modalScoreValue" class="score-number">85%</div>
+                    <div class="score-label">Match Fit</div>
+                </div>
+            </div>
+            <div id="modalLoadingState" class="ai-modal-loading" style="display: none;">
+                <div class="ai-spinner"></div>
+                <p>Generating AI Career Intelligence...</p>
+            </div>
+            <div id="modalContentArea" class="ai-modal-body">
+                <div class="ai-engine-banner">
+                    <div class="engine-badge">
+                        <span id="modalEngineIcon" class="engine-icon">✨</span>
+                    </div>
+                    <div class="engine-info">
+                        <strong id="modalEngineTitle">Google Gemini 1.5 Flash</strong>
+                        <span id="modalEngineNotice">Contextual generative skill evaluation.</span>
+                    </div>
+                </div>
+                <div class="ai-modal-section">
+                    <div class="ai-section-title">
+                        <span>📋</span> Executive Evaluation &amp; Fit Analysis
+                    </div>
+                    <p id="modalExplanation" class="ai-explanation-text"></p>
+                </div>
+                <div class="ai-modal-section">
+                    <div class="ai-skills-grid">
+                        <div class="ai-skills-column column-matched">
+                            <div class="column-header"><span class="dot-icon green"></span> Verified Matching Strengths</div>
+                            <div id="modalMatchedSkillsList" class="ai-chips-flow"></div>
+                        </div>
+                        <div class="ai-skills-column column-missing">
+                            <div class="column-header"><span class="dot-icon purple"></span> High-Priority Skill Gaps</div>
+                            <div id="modalMissingSkillsList" class="ai-chips-flow"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="ai-modal-section">
+                    <div class="ai-section-title">
+                        <span>🚀</span> Personalized Learning Roadmap &amp; Action Plan
+                    </div>
+                    <div id="modalRoadmapList" class="ai-roadmap-list"></div>
+                </div>
+            </div>
+            <div class="ai-modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeAiSkillModal()">Close</button>
+                <a id="modalApplyBtn" href="#" target="_blank" rel="noopener noreferrer" class="btn btn-apply">
+                    Apply on Company Portal ↗
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/script.js?v=20260916_v4"></script>
+</body>
+</html>

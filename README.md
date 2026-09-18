@@ -1,5 +1,12 @@
 # ⚡ Smart Job Finder - AI-Powered Job Matching System
 
+[![Live Demo](https://img.shields.io/badge/Live%20Deployment-Railway-00c853?style=for-the-badge&logo=railway)](https://smartjobfinder-web-production.up.railway.app/)
+[![Java](https://img.shields.io/badge/Java-17%2B-orange?style=for-the-badge&logo=openjdk)](https://openjdk.org/)
+[![Jakarta EE](https://img.shields.io/badge/Jakarta%20EE-10-red?style=for-the-badge)](https://jakarta.ee/)
+[![MySQL](https://img.shields.io/badge/MySQL-8.0-blue?style=for-the-badge&logo=mysql)](https://www.mysql.com/)
+
+> 🌐 **Live Cloud Deployment**: [https://smartjobfinder-web-production.up.railway.app](https://smartjobfinder-web-production.up.railway.app/)
+
 **Smart Job Finder** is a full-stack Java web application built on **Jakarta Servlet 6.0**, **JDBC**, **MySQL**, and modern **Vanilla HTML5/CSS3/JS**. It provides intelligent career opportunity matching by calculating multi-criteria compatibility scores (0–100%) based on technical skills, desired job roles, experience levels, and expected compensation.
 
 ---
@@ -13,7 +20,7 @@
    - Direct links to official corporate recruitment portals for Google, Microsoft, Amazon, Deloitte, Apple, Meta, TCS, Infosys, and more.
 3. **Robust Connection & Resource Management**:
    - Clean, leak-free database operations using Java `try-with-resources`.
-   - Automatic multi-credential fallback (`lahari0405`, `root`, blank password, or `DB_PASSWORD` environment variable).
+   - Automatic multi-credential fallback (`root`, blank password, or `DB_PASSWORD` / `MYSQLPASSWORD` environment variables).
 4. **Session Management & Authentication**:
    - User registration and login with session persistence (`userName`, `userEmail`, `userId`).
    - Clean session invalidation with dedicated `/logout` handler.
@@ -137,8 +144,9 @@ Run `com.SmartJobFinder.DBTest` to verify that your MySQL connection is active a
 ### 2. Administrator Account:
 - **Username**: `admin`
 - **Email**: `admin@smartjobfinder.com`
-- **Password**: `admin123`
-- **Admin Portal URL**: `http://localhost:8080/smartjobfinder/admin-login.html` (or `/adminLogin`)
+- **Password**: `12345`
+- **Admin Portal URL**: `/admin-login.html` (or `/adminLogin`)
+- **Live Cloud Admin URL**: `https://smartjobfinder-web-production.up.railway.app/admin-login.html`
 
 ---
 

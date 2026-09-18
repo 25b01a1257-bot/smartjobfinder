@@ -1,8 +1,37 @@
-# OS & IDE
+# Secrets and Sensitive Environment Variables
+.env
+.env.*
+*.env
+*.pem
+*.key
+*.token
+*.secret
+
+# Compiled Java Classes in temporary/output roots
+/com/
+*.class
+
+# Log files
+*.log
+logs/
+
+# OS Metadata
 .DS_Store
 Thumbs.db
-*.log
+ehthumbs.db
+[Dd]esktop.ini
+
+# IDE & Editor Configurations
 .vscode/
 .idea/
 .antigravity-ide/
-/com/
+*.iml
+.project
+.classpath
+.settings/
+nbproject/
+
+# Temporary / Scratch files
+scratch/
+tmp/
+temp/

@@ -6,9 +6,6 @@ import java.sql.DriverManager;
 public class PwdTest {
     public static void main(String[] args) {
         String[] list = {
-            "lahari0405", "Lahari0405", "Lahari@0405", "lahari@0405", "lahari", "Lahari", "Lahari@123", "lahari123",
-            "poojith", "Poojith", "poojith123", "Poojith123", "Poojith@123", "poojith@123", "poojith0405", "Poojith0405",
-            "pooji", "Pooji", "pooji123", "Pooji123", "Pooji@123", "pooji@123",
             "root", "Root", "ROOT", "root123", "Root123", "Root@123", "root@123", "root1234", "Root1234", "Root@1234",
             "admin", "Admin", "ADMIN", "admin123", "Admin123", "Admin@123", "admin@123",
             "password", "Password", "Password123", "Password@123", "password@123", "pass", "Pass@123",

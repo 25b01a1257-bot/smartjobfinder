@@ -125,8 +125,8 @@ public class DatabaseSetup {
             potentialPasswords = new String[]{args[0].trim()};
         } else {
             potentialPasswords = new String[]{
-                "0000", "lahari0405", "root", "", "admin", "password", 
-                "1234", "123456", "12345678", "root123", "mysql"
+                "root", "", "admin", "password", "1234", "12345", 
+                "123456", "12345678", "0000", "root123", "mysql"
             };
         }
 

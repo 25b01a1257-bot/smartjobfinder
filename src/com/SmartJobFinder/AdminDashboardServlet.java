@@ -33,6 +33,10 @@ public class AdminDashboardServlet extends HttpServlet {
         public String logo;
         public String applyUrl;
         public String status;
+        public String requiredDegree;
+        public String eligibleBranches;
+        public String minQualification;
+        public String location;
     }
 
     @Override
@@ -115,6 +119,14 @@ public class AdminDashboardServlet extends HttpServlet {
                         if (item.status == null || item.status.trim().isEmpty()) {
                             item.status = "ACTIVE";
                         }
+                        item.requiredDegree = rs.getString("required_degree");
+                        if (item.requiredDegree == null || item.requiredDegree.trim().isEmpty()) item.requiredDegree = "B.Tech / B.E., M.Tech, MCA";
+                        item.eligibleBranches = rs.getString("eligible_branches");
+                        if (item.eligibleBranches == null || item.eligibleBranches.trim().isEmpty()) item.eligibleBranches = "Computer Science, Information Technology, Electronics & Communication";
+                        item.minQualification = rs.getString("min_qualification");
+                        if (item.minQualification == null || item.minQualification.trim().isEmpty()) item.minQualification = "B.Tech / B.E.";
+                        item.location = rs.getString("location");
+                        if (item.location == null || item.location.trim().isEmpty()) item.location = "Bangalore / Remote";
 
                         companies.add(item);
                         totalCompanies++;
@@ -322,7 +334,12 @@ public class AdminDashboardServlet extends HttpServlet {
                 out.println("                                    </div>");
                 out.println("                                </div>");
                 out.println("                            </td>");
-                out.println("                            <td class='td-role'><strong>" + escapeHtml(c.role) + "</strong></td>");
+                out.println("                            <td class='td-role'>");
+                out.println("                                <strong>" + escapeHtml(c.role) + "</strong>");
+                out.println("                                <div style='font-size: 11px; color: #64748b; margin-top: 3px;'>🎓 " + escapeHtml(c.requiredDegree) + "</div>");
+                out.println("                                <div style='font-size: 11px; color: #0284c7; margin-top: 2px;'>🌿 " + escapeHtml(c.eligibleBranches) + "</div>");
+                out.println("                                <div style='font-size: 11px; color: #475569; margin-top: 2px;'>📍 " + escapeHtml(c.location) + "</div>");
+                out.println("                            </td>");
                 out.println("                            <td class='td-skills'>");
                 out.println("                                <div class='table-skills-wrapper'>");
                 if (c.skills != null) {

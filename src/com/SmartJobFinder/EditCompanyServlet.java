@@ -83,6 +83,14 @@ public class EditCompanyServlet extends HttpServlet {
                     String st = rs.getString("status");
                     if (st != null && !st.trim().isEmpty()) status = st.trim().toUpperCase();
                 } catch (Exception ignore) {}
+                String requiredDegree = rs.getString("required_degree");
+                if (requiredDegree == null || requiredDegree.trim().isEmpty()) requiredDegree = "B.Tech / B.E., M.Tech, MCA";
+                String eligibleBranches = rs.getString("eligible_branches");
+                if (eligibleBranches == null || eligibleBranches.trim().isEmpty()) eligibleBranches = "Computer Science, Information Technology, Electronics & Communication";
+                String minQualification = rs.getString("min_qualification");
+                if (minQualification == null || minQualification.trim().isEmpty()) minQualification = "B.Tech / B.E.";
+                String location = rs.getString("location");
+                if (location == null || location.trim().isEmpty()) location = "Bangalore / Remote";
 
                 if ("json".equalsIgnoreCase(format)) {
                     response.setContentType("application/json;charset=UTF-8");
@@ -97,7 +105,11 @@ public class EditCompanyServlet extends HttpServlet {
                     out.print("\"description\":\"" + escapeJson(description) + "\",");
                     out.print("\"logo\":\"" + escapeJson(logo) + "\",");
                     out.print("\"apply_url\":\"" + escapeJson(applyUrl) + "\",");
-                    out.print("\"status\":\"" + escapeJson(status) + "\"");
+                    out.print("\"status\":\"" + escapeJson(status) + "\",");
+                    out.print("\"required_degree\":\"" + escapeJson(requiredDegree) + "\",");
+                    out.print("\"eligible_branches\":\"" + escapeJson(eligibleBranches) + "\",");
+                    out.print("\"min_qualification\":\"" + escapeJson(minQualification) + "\",");
+                    out.print("\"location\":\"" + escapeJson(location) + "\"");
                     out.print("}");
                 } else {
                     // Render dedicated Edit Company Page
@@ -234,6 +246,28 @@ public class EditCompanyServlet extends HttpServlet {
                     out.println("                    </div>");
                     out.println("                </div>");
 
+                    out.println("                <div class='form-grid-2'>");
+                    out.println("                    <div class='form-group'>");
+                    out.println("                        <label for='required_degree'>Eligible Degrees (Comma-separated)</label>");
+                    out.println("                        <input type='text' id='required_degree' name='required_degree' class='form-control' value='" + escapeHtml(requiredDegree) + "' placeholder='e.g. B.Tech / B.E., M.Tech, MCA'>");
+                    out.println("                    </div>");
+                    out.println("                    <div class='form-group'>");
+                    out.println("                        <label for='eligible_branches'>Eligible Branches (Comma-separated)</label>");
+                    out.println("                        <input type='text' id='eligible_branches' name='eligible_branches' class='form-control' value='" + escapeHtml(eligibleBranches) + "' placeholder='e.g. Computer Science, Information Technology'>");
+                    out.println("                    </div>");
+                    out.println("                </div>");
+
+                    out.println("                <div class='form-grid-2'>");
+                    out.println("                    <div class='form-group'>");
+                    out.println("                        <label for='min_qualification'>Minimum Qualification</label>");
+                    out.println("                        <input type='text' id='min_qualification' name='min_qualification' class='form-control' value='" + escapeHtml(minQualification) + "' placeholder='e.g. B.Tech / B.E.'>");
+                    out.println("                    </div>");
+                    out.println("                    <div class='form-group'>");
+                    out.println("                        <label for='location'>Job Location / Work Mode</label>");
+                    out.println("                        <input type='text' id='location' name='location' class='form-control' value='" + escapeHtml(location) + "' placeholder='e.g. Bangalore, Hyderabad, Remote'>");
+                    out.println("                    </div>");
+                    out.println("                </div>");
+
                     out.println("                <div class='form-group'>");
                     out.println("                    <label for='description'>Job Description / Overview</label>");
                     out.println("                    <textarea id='description' name='description' class='form-control' rows='3'>" + escapeHtml(description) + "</textarea>");
@@ -341,6 +375,10 @@ public class EditCompanyServlet extends HttpServlet {
         String logo = request.getParameter("logo");
         String applyUrl = request.getParameter("apply_url");
         String status = request.getParameter("status");
+        String requiredDegree = request.getParameter("required_degree");
+        String eligibleBranches = request.getParameter("eligible_branches");
+        String minQualification = request.getParameter("min_qualification");
+        String location = request.getParameter("location");
 
         if (idStr == null || idStr.trim().isEmpty() ||
             companyName == null || companyName.trim().isEmpty() ||
@@ -358,6 +396,18 @@ public class EditCompanyServlet extends HttpServlet {
         }
         if (description == null) {
             description = "";
+        }
+        if (requiredDegree == null || requiredDegree.trim().isEmpty()) {
+            requiredDegree = "B.Tech / B.E., M.Tech, MCA";
+        }
+        if (eligibleBranches == null || eligibleBranches.trim().isEmpty()) {
+            eligibleBranches = "Computer Science, Information Technology, Electronics & Communication";
+        }
+        if (minQualification == null || minQualification.trim().isEmpty()) {
+            minQualification = "B.Tech / B.E.";
+        }
+        if (location == null || location.trim().isEmpty()) {
+            location = "Bangalore / Remote";
         }
 
         // Handle uploaded file or resolve logo
@@ -388,7 +438,8 @@ public class EditCompanyServlet extends HttpServlet {
             }
 
             String sql = "UPDATE companies SET company_name = ?, skills = ?, role = ?, salary = ?, "
-                       + "experience = ?, description = ?, logo = ?, apply_url = ?, status = ? WHERE id = ?";
+                       + "experience = ?, description = ?, logo = ?, apply_url = ?, status = ?, "
+                       + "required_degree = ?, eligible_branches = ?, min_qualification = ?, location = ? WHERE id = ?";
             PreparedStatement stmt = connection.prepareStatement(sql);
             stmt.setString(1, companyName.trim());
             stmt.setString(2, skills.trim());
@@ -399,7 +450,11 @@ public class EditCompanyServlet extends HttpServlet {
             stmt.setString(7, finalLogo);
             stmt.setString(8, applyUrl.trim());
             stmt.setString(9, status);
-            stmt.setInt(10, id);
+            stmt.setString(10, requiredDegree.trim());
+            stmt.setString(11, eligibleBranches.trim());
+            stmt.setString(12, minQualification.trim());
+            stmt.setString(13, location.trim());
+            stmt.setInt(14, id);
 
             int result = stmt.executeUpdate();
             stmt.close();

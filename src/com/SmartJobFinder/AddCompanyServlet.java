@@ -48,6 +48,10 @@ public class AddCompanyServlet extends HttpServlet {
         String logo = request.getParameter("logo");
         String applyUrl = request.getParameter("apply_url");
         String status = request.getParameter("status");
+        String requiredDegree = request.getParameter("required_degree");
+        String eligibleBranches = request.getParameter("eligible_branches");
+        String minQualification = request.getParameter("min_qualification");
+        String location = request.getParameter("location");
 
         if (companyName == null || companyName.trim().isEmpty() ||
             role == null || role.trim().isEmpty() ||
@@ -64,6 +68,18 @@ public class AddCompanyServlet extends HttpServlet {
         }
         if (description == null) {
             description = "";
+        }
+        if (requiredDegree == null || requiredDegree.trim().isEmpty()) {
+            requiredDegree = "B.Tech / B.E., M.Tech, MCA";
+        }
+        if (eligibleBranches == null || eligibleBranches.trim().isEmpty()) {
+            eligibleBranches = "Computer Science, Information Technology, Electronics & Communication";
+        }
+        if (minQualification == null || minQualification.trim().isEmpty()) {
+            minQualification = "B.Tech / B.E.";
+        }
+        if (location == null || location.trim().isEmpty()) {
+            location = "Bangalore / Remote";
         }
 
         // Handle uploaded file or resolve logo
@@ -91,8 +107,8 @@ public class AddCompanyServlet extends HttpServlet {
                 return;
             }
 
-            String sql = "INSERT INTO companies (company_name, skills, role, salary, experience, description, logo, apply_url, status) "
-                       + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            String sql = "INSERT INTO companies (company_name, skills, role, salary, experience, description, logo, apply_url, status, required_degree, eligible_branches, min_qualification, location) "
+                       + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
             PreparedStatement stmt = connection.prepareStatement(sql);
             stmt.setString(1, companyName.trim());
             stmt.setString(2, skills.trim());
@@ -103,6 +119,10 @@ public class AddCompanyServlet extends HttpServlet {
             stmt.setString(7, finalLogo);
             stmt.setString(8, applyUrl.trim());
             stmt.setString(9, status);
+            stmt.setString(10, requiredDegree.trim());
+            stmt.setString(11, eligibleBranches.trim());
+            stmt.setString(12, minQualification.trim());
+            stmt.setString(13, location.trim());
 
             int result = stmt.executeUpdate();
             stmt.close();

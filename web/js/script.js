@@ -592,10 +592,18 @@ function fetchMatchingJobs() {
     const roleElem = document.getElementById('role');
     const expElem = document.getElementById('experience');
     const salElem = document.getElementById('salary');
+    const degElem = document.getElementById('degree');
+    const branchElem = document.getElementById('branch');
+    const locElem = document.getElementById('location');
+    const eligElem = document.getElementById('eligibleOnly');
 
     const role = roleElem ? roleElem.value.trim() : '';
     const experience = expElem ? expElem.value.trim() : '1';
     const salary = salElem ? salElem.value.trim() : '';
+    const degree = degElem ? degElem.value.trim() : '';
+    const branch = branchElem ? branchElem.value.trim() : '';
+    const location = locElem ? locElem.value.trim() : '';
+    const eligibleOnly = eligElem && eligElem.checked ? 'true' : 'false';
 
     const params = new URLSearchParams();
     params.append('format', 'json');
@@ -603,6 +611,10 @@ function fetchMatchingJobs() {
     params.append('role', role);
     params.append('experience', experience);
     params.append('salary', salary);
+    if (degree) params.append('degree', degree);
+    if (branch) params.append('branch', branch);
+    if (location) params.append('location', location);
+    if (eligibleOnly === 'true') params.append('eligibleOnly', 'true');
 
     fetch('findJobs?' + params.toString(), {
         method: 'GET',
@@ -614,6 +626,7 @@ function fetchMatchingJobs() {
     })
     .then(data => {
         if (loading) loading.style.display = 'none';
+        window.__currentJobsData = data.jobs || [];
         renderDynamicJobCards(data.jobs || [], selectedSkills);
     })
     .catch(err => {
@@ -640,9 +653,9 @@ function renderDynamicJobCards(jobs, skillsSelected) {
 
     if (subtitleText) {
         if (skillsSelected.length > 0) {
-            subtitleText.textContent = `Sorted by skill overlap: jobs matching ${skillsSelected.join(', ')} appear first.`;
+            subtitleText.textContent = `Sorted by skill overlap & eligibility: matching openings appear first.`;
         } else {
-            subtitleText.textContent = `Select or type skills above to filter and prioritize matching companies in real-time.`;
+            subtitleText.textContent = `Filter by degree, branch, skills, or location to update opportunities in real-time.`;
         }
     }
 
@@ -653,7 +666,7 @@ function renderDynamicJobCards(jobs, skillsSelected) {
             const emptyQueryText = document.getElementById('noMatchesQueryText');
             if (emptyQueryText) {
                 emptyQueryText.textContent = skillsSelected.length > 0
-                    ? `No openings matched your selected skills: "${skillsSelected.join(', ')}".`
+                    ? `No openings matched your selected skills: "${skillsSelected.join(', ')}". Try widening branch or degree filters.`
                     : 'No openings found matching your criteria.';
             }
         }
@@ -674,6 +687,11 @@ function renderDynamicJobCards(jobs, skillsSelected) {
         const displaySal = job.displaySalary || job.salary || 'Competitive';
         const exp = job.experience || '0-2';
         const desc = job.description || '';
+        const requiredDegree = job.requiredDegree || 'B.Tech / B.E., M.Tech, MCA';
+        const eligibleBranches = job.eligibleBranches || 'Computer Science, IT';
+        const jobLoc = job.location || 'Bangalore / Remote';
+        const isEligible = job.isEligible !== false;
+        const eligibilityReason = job.eligibilityReason || 'Eligible for your qualification.';
 
         // Matched chips HTML
         let matchedHtml = '';
@@ -705,8 +723,40 @@ function renderDynamicJobCards(jobs, skillsSelected) {
             `;
         }
 
+        // Learning Topics HTML (Phase 6 AI Skill Gap Analyzer)
+        let learningTopicsHtml = '';
+        if (job.learningTopics && job.learningTopics.length > 0) {
+            learningTopicsHtml = `
+                <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px 12px; margin-top: 10px; font-size: 12px;">
+                    <strong style="color: #475569; display: block; margin-bottom: 6px;">📚 Curated Learning Topics &amp; Resources:</strong>
+                    <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+                        ${job.learningTopics.map(t => `
+                            <a href="${escapeHtml(t.resource)}" target="_blank" rel="noopener noreferrer" style="text-decoration: none; display: inline-flex; align-items: center; gap: 4px; background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: 600;">
+                                <span>📖 ${escapeHtml(t.topic)}</span>
+                                <span style="font-size: 10px; opacity: 0.8;">(${escapeHtml(t.priority)})</span>
+                            </a>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        // Eligibility Banner
+        let eligibilityBadgeHtml = isEligible
+            ? '<span class="status-badge status-shortlisted" style="font-size: 11px;">✅ Eligible</span>'
+            : '<span class="status-badge status-rejected" style="font-size: 11px;">⚠️ Not Eligible</span>';
+
+        let eligibilityAlertHtml = '';
+        if (!isEligible) {
+            eligibilityAlertHtml = `
+                <div style="background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; padding: 8px 12px; margin-top: 8px; font-size: 12px; color: #b91c1c; line-height: 1.4;">
+                    <strong>Eligibility Notice:</strong> ${escapeHtml(eligibilityReason)}
+                </div>
+            `;
+        }
+
         html += `
-            <div class="job-card">
+            <div class="job-card ${isEligible ? '' : 'job-card-ineligible'}">
                 <div class="job-card-top">
                     <div class="logo-wrapper">
                         <img src="${escapeHtml(logoPath)}" alt="${escapeHtml(company)} Logo" class="company-logo" onerror="this.onerror=null;this.src='images/default-company.svg';">
@@ -714,10 +764,12 @@ function renderDynamicJobCards(jobs, skillsSelected) {
                     <div class="company-info">
                         <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:8px;">
                             <h3 class="company-name">${escapeHtml(company)}</h3>
-                            <div class="ai-match-card-badge ${tierClass}" title="${score}% Compatibility with your profile">
-                                <span class="ai-badge-sparkle">✨</span>
-                                <span class="ai-badge-score">${score}%</span>
-                                <span class="ai-badge-label">${tierLabel}</span>
+                            <div style="display: flex; gap: 6px; align-items: center;">
+                                ${eligibilityBadgeHtml}
+                                <div class="ai-match-card-badge ${tierClass}" title="${score}% Compatibility with your profile">
+                                    <span class="ai-badge-sparkle">✨</span>
+                                    <span class="ai-badge-score">${score}%</span>
+                                </div>
                             </div>
                         </div>
                         <h4 class="job-role">${escapeHtml(role)}</h4>
@@ -730,9 +782,16 @@ function renderDynamicJobCards(jobs, skillsSelected) {
 
                 <div class="job-meta-badges">
                     <span class="badge badge-salary">💰 ₹${escapeHtml(displaySal)} / yr</span>
-                    <span class="badge badge-exp">💼 ${escapeHtml(exp)} yrs exp</span>
-                    <span class="badge badge-verified">✓ Verified Opening</span>
+                    <span class="badge badge-exp">💼 ${escapeHtml(exp)} yrs</span>
+                    <span class="badge" style="background:#f1f5f9; color:#334155;">📍 ${escapeHtml(jobLoc)}</span>
                 </div>
+
+                <div style="font-size: 12px; color: #475569; margin: 8px 0; background: #f8fafc; padding: 6px 10px; border-radius: 6px; border: 1px solid #f1f5f9;">
+                    <div>🎓 <strong>Degree:</strong> ${escapeHtml(requiredDegree)}</div>
+                    <div style="margin-top: 2px;">🌿 <strong>Eligible Branches:</strong> ${escapeHtml(eligibleBranches)}</div>
+                </div>
+
+                ${eligibilityAlertHtml}
 
                 ${desc ? `<p class="job-description-text">${escapeHtml(desc)}</p>` : ''}
 
@@ -741,7 +800,9 @@ function renderDynamicJobCards(jobs, skillsSelected) {
                     ${missingHtml}
                 </div>
 
-                <div class="job-card-actions">
+                ${learningTopicsHtml}
+
+                <div class="job-card-actions" style="margin-top: 14px;">
                     <button type="button" class="btn btn-ai-analysis"
                             data-id="${job.id}"
                             data-company="${escapeHtml(company)}"
@@ -756,11 +817,14 @@ function renderDynamicJobCards(jobs, skillsSelected) {
                             data-target-role="${escapeHtml(document.getElementById('role') ? document.getElementById('role').value : '')}"
                             data-user-exp="${escapeHtml(document.getElementById('experience') ? document.getElementById('experience').value : '1')}"
                             onclick="openAiSkillModal(this)">
-                        ✨ AI Skill Analysis
+                        ✨ Skill Gap
                     </button>
-                    <a href="${escapeHtml(applyUrl)}" target="_blank" rel="noopener noreferrer" class="btn btn-apply">
-                        Apply on ${escapeHtml(company)} ↗
+                    <a href="interview-prep.html?role=${encodeURIComponent(role)}&company=${encodeURIComponent(company)}" class="btn btn-secondary" style="font-size: 12px; padding: 8px 12px; text-decoration: none;">
+                        🎯 Prep Interview
                     </a>
+                    <button type="button" class="btn btn-apply" onclick="openApplyWorkflowModalById(${job.id})">
+                        Apply Now ➔
+                    </button>
                 </div>
             </div>
         `;
@@ -768,6 +832,137 @@ function renderDynamicJobCards(jobs, skillsSelected) {
 
     grid.innerHTML = html;
     bindImageFallbacks();
+}
+
+// ========================================================
+// Phase 3: Complete Apply Now Application Workflow Handlers
+// ========================================================
+
+function openApplyWorkflowModalById(jobId) {
+    const job = (window.__currentJobsData || []).find(j => j.id === jobId);
+    if (!job) {
+        console.error('Job not found for ID', jobId);
+        return;
+    }
+    openApplyWorkflowModal(job);
+}
+
+function openApplyWorkflowModal(job) {
+    const modal = document.getElementById('applyWorkflowModal');
+    if (!modal) return;
+
+    const company = job.companyName || 'Company';
+    const role = job.role || 'Job Role';
+    const logo = job.logo || 'images/default-company.svg';
+    const url = job.applyUrl || '#';
+    const salary = job.displaySalary || job.salary || 'Competitive';
+    const exp = job.experience || '0-2';
+    const degree = job.requiredDegree || 'B.Tech / B.E., M.Tech, MCA';
+    const branches = job.eligibleBranches || 'All branches';
+    const location = job.location || 'Bangalore / Remote';
+    const isEligible = job.isEligible !== false;
+    const reason = job.eligibilityReason || 'Eligible based on profile.';
+
+    document.getElementById('workflowCompanyName').textContent = company;
+    document.getElementById('workflowJobRole').textContent = role;
+    document.getElementById('workflowCompanyLogo').src = logo;
+    document.getElementById('workflowLocation').textContent = '📍 ' + location;
+    document.getElementById('workflowSalary').textContent = '💰 ₹' + salary;
+    document.getElementById('workflowExperience').textContent = '💼 ' + exp + ' yrs exp';
+    document.getElementById('workflowRequiredDegree').textContent = degree;
+    document.getElementById('workflowEligibleBranches').textContent = branches;
+    document.getElementById('workflowRequiredSkills').textContent = job.skills || 'Technical Skills';
+
+    const badge = document.getElementById('workflowEligibilityBadge');
+    const reasonBox = document.getElementById('workflowEligibilityReasonBox');
+
+    if (isEligible) {
+        badge.className = 'status-badge status-shortlisted';
+        badge.textContent = '✅ Eligible';
+        reasonBox.style.background = '#ecfdf5';
+        reasonBox.style.color = '#065f46';
+        reasonBox.style.border = '1px solid #a7f3d0';
+        reasonBox.textContent = '✓ ' + reason;
+    } else {
+        badge.className = 'status-badge status-rejected';
+        badge.textContent = '⚠️ Eligibility Notice';
+        reasonBox.style.background = '#fef2f2';
+        reasonBox.style.color = '#991b1b';
+        reasonBox.style.border = '1px solid #fecaca';
+        reasonBox.textContent = '✕ ' + reason;
+    }
+
+    const officialBtn = document.getElementById('workflowOfficialLinkBtn');
+    officialBtn.href = url && url !== '#' ? url : 'https://www.google.com/search?q=' + encodeURIComponent(company + ' careers ' + role);
+    officialBtn.textContent = '🌐 Proceed to Official ' + company + ' Portal ↗';
+
+    // Populate Tracker Form
+    document.getElementById('trackerCompanyId').value = job.id;
+    document.getElementById('trackerCompanyName').value = company;
+    document.getElementById('trackerJobTitle').value = role;
+    document.getElementById('trackerOfficialUrl').value = url;
+    document.getElementById('trackerStatusSelect').value = 'Applied';
+    document.getElementById('trackerNotes').value = '';
+    document.getElementById('trackerFollowUpDate').value = '';
+    const successBox = document.getElementById('trackerModalSuccess');
+    if (successBox) successBox.style.display = 'none';
+
+    modal.style.display = 'flex';
+}
+
+function closeApplyWorkflowModal() {
+    const modal = document.getElementById('applyWorkflowModal');
+    if (modal) modal.style.display = 'none';
+}
+
+function saveApplicationFromWorkflowModal() {
+    const companyId = document.getElementById('trackerCompanyId').value;
+    const companyName = document.getElementById('trackerCompanyName').value;
+    const jobTitle = document.getElementById('trackerJobTitle').value;
+    const officialUrl = document.getElementById('trackerOfficialUrl').value;
+    const status = document.getElementById('trackerStatusSelect').value;
+    const followUpDate = document.getElementById('trackerFollowUpDate').value;
+    const notes = document.getElementById('trackerNotes').value;
+    const successBox = document.getElementById('trackerModalSuccess');
+
+    const params = new URLSearchParams();
+    params.append('action', 'save_or_apply');
+    params.append('company_id', companyId);
+    params.append('company_name', companyName);
+    params.append('job_title', jobTitle);
+    params.append('official_url', officialUrl);
+    params.append('status', status);
+    params.append('follow_up_date', followUpDate);
+    params.append('notes', notes);
+
+    fetch('api/applications', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: params.toString()
+    })
+    .then(res => {
+        if (res.status === 401) {
+            alert('Please log in to save this application to your Application Tracker.');
+            window.location.href = 'login.html';
+            return null;
+        }
+        return res.json();
+    })
+    .then(data => {
+        if (!data) return;
+        if (data.success) {
+            if (successBox) {
+                successBox.textContent = `✅ Successfully saved to Application Tracker as "${status}"! You can monitor it on the Application Tracker page.`;
+                successBox.style.display = 'block';
+            }
+        } else {
+            alert('Error: ' + (data.error || 'Failed to save application'));
+        }
+    })
+    .catch(err => {
+        console.error(err);
+        alert('Network error while saving to tracker.');
+    });
 }
 
 function bindImageFallbacks() {

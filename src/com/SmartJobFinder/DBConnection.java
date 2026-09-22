@@ -138,7 +138,7 @@ public class DBConnection {
 
             // Candidate passwords for local development
             String[] candidatePasswords = new String[]{
-                password, "", "root", "admin", "password", 
+                password, "lahari0405", "", "root", "admin", "password", 
                 "1234", "12345", "123456", "12345678", "0000", "root123", "mysql"
             };
 

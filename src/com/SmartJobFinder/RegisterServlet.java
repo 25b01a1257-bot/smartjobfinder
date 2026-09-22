@@ -29,14 +29,26 @@ public class RegisterServlet extends HttpServlet {
         String name = request.getParameter("name");
         String email = request.getParameter("email");
         String password = request.getParameter("password");
+        String degree = request.getParameter("degree");
+        String branch = request.getParameter("branch");
+        String gradYearStr = request.getParameter("graduation_year");
 
         if (name == null || name.trim().isEmpty() ||
             email == null || email.trim().isEmpty() ||
             password == null || password.trim().isEmpty()) {
 
-            String err = URLEncoder.encode("All fields are required.", StandardCharsets.UTF_8);
+            String err = URLEncoder.encode("Full name, email, and password are required.", StandardCharsets.UTF_8);
             response.sendRedirect("register.html?error=" + err);
             return;
+        }
+
+        if (degree == null || degree.trim().isEmpty()) degree = "B.Tech / B.E.";
+        if (branch == null || branch.trim().isEmpty()) branch = "Computer Science & Engineering";
+        int gradYear = 2025;
+        if (gradYearStr != null && !gradYearStr.trim().isEmpty()) {
+            try {
+                gradYear = Integer.parseInt(gradYearStr.replaceAll("[^0-9]", ""));
+            } catch (Exception ignore) {}
         }
 
         try {
@@ -67,20 +79,26 @@ public class RegisterServlet extends HttpServlet {
             checkResult.close();
             checkStmt.close();
 
-            // Insert new user
-            String sql = "INSERT INTO users (name, email, password) VALUES (?, ?, ?)";
+            // Insert new user with secure password hash and educational details
+            String hashedPassword = SecurityUtil.hashPassword(password.trim());
+            String sql = "INSERT INTO users (name, email, password, degree, branch, graduation_year) VALUES (?, ?, ?, ?, ?, ?)";
             PreparedStatement statement = connection.prepareStatement(sql);
             statement.setString(1, name.trim());
             statement.setString(2, email.trim());
-            statement.setString(3, password);
+            statement.setString(3, hashedPassword);
+            statement.setString(4, degree.trim());
+            statement.setString(5, branch.trim());
+            statement.setInt(6, gradYear);
 
             int result = statement.executeUpdate();
-
             statement.close();
             connection.close();
 
             if (result > 0) {
-                String msg = URLEncoder.encode("Account registered successfully! Please sign in.", StandardCharsets.UTF_8);
+                // Dispatch registration confirmation email via Jakarta Mail asynchronously
+                EmailService.sendWelcomeEmailAsync(name.trim(), email.trim());
+
+                String msg = URLEncoder.encode("Account registered successfully! A confirmation email has been dispatched. Please sign in.", StandardCharsets.UTF_8);
                 response.sendRedirect("login.html?message=" + msg);
             } else {
                 String err = URLEncoder.encode("Registration failed. Please try again.", StandardCharsets.UTF_8);

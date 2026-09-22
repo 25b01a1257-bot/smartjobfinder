@@ -45,34 +45,56 @@ public class LoginServlet extends HttpServlet {
                 return;
             }
 
-            String sql = "SELECT id, name, email FROM users WHERE email = ? AND password = ?";
+            String sql = "SELECT id, name, email, password, degree, branch, graduation_year, skills, preferred_role FROM users WHERE LOWER(email) = LOWER(?)";
             PreparedStatement statement = connection.prepareStatement(sql);
             statement.setString(1, email.trim());
-            statement.setString(2, password);
 
             ResultSet result = statement.executeQuery();
 
             if (result.next()) {
+                int id = result.getInt("id");
                 String name = result.getString("name");
+                String storedPassword = result.getString("password");
+                String degree = result.getString("degree");
+                String branch = result.getString("branch");
+                String skills = result.getString("skills");
+                String role = result.getString("preferred_role");
 
-                // Initialize HTTP Session
-                HttpSession session = request.getSession(true);
-                session.setAttribute("userEmail", email.trim());
-                session.setAttribute("userName", name);
+                if (SecurityUtil.verifyPassword(password, storedPassword)) {
+                    // Initialize HTTP Session
+                    HttpSession session = request.getSession(true);
+                    session.setAttribute("userId", id);
+                    session.setAttribute("userEmail", email.trim());
+                    session.setAttribute("userName", name);
+                    session.setAttribute("userDegree", degree != null ? degree : "B.Tech / B.E.");
+                    session.setAttribute("userBranch", branch != null ? branch : "Computer Science & Engineering");
+                    session.setAttribute("userSkills", skills != null ? skills : "");
+                    session.setAttribute("userRole", role != null ? role : "Software Engineer");
 
-                result.close();
-                statement.close();
-                connection.close();
+                    // Transparent upgrade of legacy plain-text password to SHA-256
+                    if (!storedPassword.equals(SecurityUtil.hashPassword(password.trim()))) {
+                        try (PreparedStatement upStmt = connection.prepareStatement("UPDATE users SET password = ? WHERE id = ?")) {
+                            upStmt.setString(1, SecurityUtil.hashPassword(password.trim()));
+                            upStmt.setInt(2, id);
+                            upStmt.executeUpdate();
+                        } catch (Exception ignore) {}
+                    }
 
-                response.sendRedirect("job-search.html");
-            } else {
-                result.close();
-                statement.close();
-                connection.close();
+                    result.close();
+                    statement.close();
+                    connection.close();
 
-                String err = URLEncoder.encode("Invalid email or password. Please try again.", StandardCharsets.UTF_8);
-                response.sendRedirect("login.html?error=" + err);
+                    response.sendRedirect("job-search.html");
+                    return;
+                }
             }
+
+            result.close();
+            statement.close();
+            connection.close();
+
+            String err = URLEncoder.encode("Invalid email or password. Please try again.", StandardCharsets.UTF_8);
+            response.sendRedirect("login.html?error=" + err);
 
         } catch (Exception e) {
             e.printStackTrace();

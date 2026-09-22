@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agentic Career Assistant - Smart Job Finder</title>
+    <link rel="stylesheet" href="css/style.css?v=20260922_v1">
+    <style>
+        .assistant-container {
+            max-width: 960px;
+            margin: 20px auto;
+            display: flex;
+            flex-direction: column;
+            height: calc(100vh - 140px);
+            min-height: 600px;
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            overflow: hidden;
+        }
+        .assistant-header-bar {
+            padding: 18px 24px;
+            background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%);
+            color: #ffffff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #4338ca;
+        }
+        .assistant-title-group h2 {
+            margin: 0 0 4px 0;
+            font-size: 20px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .assistant-title-group p {
+            margin: 0;
+            font-size: 13px;
+            color: #c7d2fe;
+        }
+        .guardrail-pill {
+            background: rgba(255,255,255,0.12);
+            border: 1px solid rgba(255,255,255,0.25);
+            padding: 4px 12px;
+            border-radius: 9999px;
+            font-size: 12px;
+            color: #e0e7ff;
+            font-weight: 600;
+        }
+
+        .chat-messages-area {
+            flex: 1;
+            padding: 24px;
+            overflow-y: auto;
+            background: #f8fafc;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        .message-bubble {
+            max-width: 82%;
+            padding: 16px 20px;
+            border-radius: 14px;
+            font-size: 14px;
+            line-height: 1.6;
+            animation: fadeIn 0.3s ease;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .user-message {
+            align-self: flex-end;
+            background: var(--primary);
+            color: #ffffff;
+            border-bottom-right-radius: 4px;
+        }
+        .bot-message {
+            align-self: flex-start;
+            background: #ffffff;
+            color: var(--text-main);
+            border: 1px solid #e2e8f0;
+            border-bottom-left-radius: 4px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+        }
+        .bot-message-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            font-weight: 700;
+            color: #4f46e5;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .bot-markdown-content h3 {
+            font-size: 16px;
+            margin: 12px 0 6px 0;
+            color: #1e1b4b;
+        }
+        .bot-markdown-content ul, .bot-markdown-content ol {
+            margin: 6px 0 12px 0;
+            padding-left: 20px;
+        }
+        .bot-markdown-content li {
+            margin-bottom: 4px;
+        }
+
+        .quick-prompts-bar {
+            padding: 10px 20px;
+            background: #ffffff;
+            border-top: 1px solid #f1f5f9;
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+        .quick-prompt-chip {
+            background: #f1f5f9;
+            border: 1px solid #e2e8f0;
+            border-radius: 9999px;
+            padding: 6px 14px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #334155;
+            cursor: pointer;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+        .quick-prompt-chip:hover {
+            background: #e2e8f0;
+            border-color: #cbd5e1;
+            color: #0f172a;
+        }
+
+        .chat-input-bar {
+            padding: 16px 20px;
+            background: #ffffff;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+        .chat-input-bar input {
+            flex: 1;
+            padding: 12px 18px;
+            font-size: 14px;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .chat-input-bar input:focus {
+            border-color: var(--primary);
+        }
+        .chat-send-btn {
+            background: var(--primary);
+            color: #ffffff;
+            border: none;
+            border-radius: 10px;
+            padding: 12px 24px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .chat-send-btn:hover {
+            background: var(--primary-hover);
+        }
+    </style>
+</head>
+<body>
+
+    <header class="app-header">
+        <div class="header-content">
+            <a href="index.html" class="logo-title">
+                <span class="logo-icon">⚡</span>
+                <h1>Smart Job Finder</h1>
+            </a>
+            <div class="header-nav-links">
+                <a href="job-search.html" class="nav-link">🔍 Job Search</a>
+                <a href="application-tracker.html" class="nav-link">📊 Application Tracker</a>
+                <a href="profile.html" class="nav-link">👤 My Profile</a>
+                <a href="career-assistant.html" class="nav-link active">🤖 AI Assistant</a>
+                <a href="interview-prep.html" class="nav-link">🎯 Interview Prep</a>
+            </div>
+            <div class="header-actions">
+                <span id="userGreeting" class="user-greeting-pill" style="display:none;">👋 Hello</span>
+                <a href="logout" class="btn btn-outline btn-sm">Sign Out</a>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-container" style="max-width: 980px;">
+        <div class="assistant-container">
+            <div class="assistant-header-bar">
+                <div class="assistant-title-group">
+                    <h2>🤖 Agentic Career Assistant</h2>
+                    <p>Context-aware career roadmaps, branch eligibility advice, skill gaps &amp; resume optimization.</p>
+                </div>
+                <div class="guardrail-pill" title="Advisory Intelligence Only: Never claims external submissions or fabricates data">
+                    🛡️ Verified Advisory Engine
+                </div>
+            </div>
+
+            <!-- Messages Area -->
+            <div id="chatMessages" class="chat-messages-area">
+                <div class="message-bubble bot-message">
+                    <div class="bot-message-header">⚡ Smart Job Finder Assistant</div>
+                    <div class="bot-markdown-content">
+                        <p>Hello! I am your <strong>Agentic Career Assistant</strong>. I analyze your academic degree, engineering branch, and technical skill profile to provide actionable, realistic career advice.</p>
+                        <p><strong>I can assist you with:</strong></p>
+                        <ul>
+                            <li>🎓 <strong>Eligibility Clarification:</strong> Which tech roles match your degree and branch</li>
+                            <li>🚀 <strong>Skill Gap Roadmaps:</strong> Step-by-step 4-week learning paths for missing tech stack skills</li>
+                            <li>📄 <strong>Resume Optimization:</strong> High-impact keywords for ATS screening</li>
+                            <li>📋 <strong>Application Checklist:</strong> Exact verification steps before visiting official portals</li>
+                            <li>🎯 <strong>Interview Strategy:</strong> Core technical and behavioral preparation tips</li>
+                        </ul>
+                        <p style="font-size: 12px; color: #64748b; margin-top: 8px;">
+                            <em>Note: I operate under strict ethical guardrails — I do not submit external applications on your behalf, nor do I fabricate employer requirements. You will always apply directly on verified official corporate portals.</em>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Prompts Bar -->
+            <div class="quick-prompts-bar">
+                <span class="quick-prompt-chip" onclick="sendQuickPrompt('How do I check if my degree and branch make me eligible for software roles?')">🎓 Branch Eligibility Rules</span>
+                <span class="quick-prompt-chip" onclick="sendQuickPrompt('Generate a 4-week learning roadmap for Spring Boot, Microservices and Docker')">🚀 4-Week Skill Roadmap</span>
+                <span class="quick-prompt-chip" onclick="sendQuickPrompt('What are top ATS resume keywords for a Java Backend Developer?')">📄 Resume ATS Keywords</span>
+                <span class="quick-prompt-chip" onclick="sendQuickPrompt('What is the complete checklist before I click Apply Now on an official portal?')">📋 Pre-Application Checklist</span>
+                <span class="quick-prompt-chip" onclick="sendQuickPrompt('How should a fresher prepare for technical coding interviews?')">🎯 Technical Interview Prep</span>
+                <span class="quick-prompt-chip" onclick="sendQuickPrompt('What are the best career paths for an Electronics & Communication (ECE) student in software?')">💡 ECE to Tech Career Advice</span>
+            </div>
+
+            <!-- Input Bar -->
+            <div class="chat-input-bar">
+                <input type="text" id="userInput" placeholder="Ask about job eligibility, skill roadmaps, resume tips, or interview preparation..." onkeydown="handleKeyDown(event)">
+                <button type="button" class="chat-send-btn" onclick="sendMessage()">
+                    Send ➔
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <script src="js/script.js?v=20260922_v1"></script>
+    <script>
+        function handleKeyDown(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        }
+
+        function sendQuickPrompt(promptText) {
+            document.getElementById('userInput').value = promptText;
+            sendMessage();
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('userInput');
+            const message = input.value.trim();
+            if (!message) return;
+
+            // Render User Bubble
+            appendUserMessage(message);
+            input.value = '';
+
+            // Render Loading Indicator
+            const loadingId = appendLoadingBubble();
+
+            const params = new URLSearchParams();
+            params.append('message', message);
+            params.append('mode', 'general');
+
+            fetch('api/careerAssistant', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: params.toString()
+            })
+            .then(res => res.json())
+            .then(data => {
+                removeLoadingBubble(loadingId);
+                if (data.reply) {
+                    appendBotMessage(data.reply);
+                } else if (data.error) {
+                    appendBotMessage('⚠️ ' + data.error);
+                }
+            })
+            .catch(err => {
+                removeLoadingBubble(loadingId);
+                appendBotMessage('❌ Sorry, I encountered a network error connecting to the career intelligence engine. Please try again.');
+            });
+        }
+
+        function appendUserMessage(text) {
+            const container = document.getElementById('chatMessages');
+            const div = document.createElement('div');
+            div.className = 'message-bubble user-message';
+            div.textContent = text;
+            container.appendChild(div);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function appendBotMessage(markdownText) {
+            const container = document.getElementById('chatMessages');
+            const div = document.createElement('div');
+            div.className = 'message-bubble bot-message';
+
+            let header = '<div class="bot-message-header">⚡ Career Assistant</div>';
+            let formatted = formatSimpleMarkdown(markdownText);
+            div.innerHTML = header + '<div class="bot-markdown-content">' + formatted + '</div>';
+
+            container.appendChild(div);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function appendLoadingBubble() {
+            const container = document.getElementById('chatMessages');
+            const div = document.createElement('div');
+            const id = 'loading_' + Date.now();
+            div.id = id;
+            div.className = 'message-bubble bot-message';
+            div.innerHTML = '<div style="display:flex; align-items:center; gap:8px; color:#6366f1;"><span>⏳</span> Analyzing career guidance...</div>';
+            container.appendChild(div);
+            container.scrollTop = container.scrollHeight;
+            return id;
+        }
+
+        function removeLoadingBubble(id) {
+            const el = document.getElementById(id);
+            if (el) el.remove();
+        }
+
+        function formatSimpleMarkdown(txt) {
+            if (!txt) return '';
+            // Basic markdown converter for clean presentation
+            let out = escapeHtml(txt);
+            // Bold
+            out = out.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+            // Headers
+            out = out.replace(/^### (.*$)/gim, '<h3>$1</h3>');
+            out = out.replace(/^## (.*$)/gim, '<h3>$1</h3>');
+            out = out.replace(/^# (.*$)/gim, '<h3>$1</h3>');
+            // Bullet items
+            out = out.replace(/^\- (.*$)/gim, '<li>$1</li>');
+            out = out.replace(/^\* (.*$)/gim, '<li>$1</li>');
+            // Wrap list items
+            out = out.replace(/(<li>[\s\S]*?<\/li>)/g, '<ul>$1</ul>');
+            out = out.replace(/<\/ul>\s*<ul>/g, '');
+            // Line breaks
+            out = out.replace(/\n\n/g, '<br><br>');
+            return out;
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        }
+    </script>
+</body>
+</html>

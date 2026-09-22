@@ -19,6 +19,10 @@ public class CompanySeedData {
         public String logo;
         public String url;
         public String status;
+        public String requiredDegree;
+        public String eligibleBranches;
+        public String minQualification;
+        public String location;
 
         public CompanyDef(String name, String skills, String role, String salary, String exp, String desc, String logo, String url) {
             this.name = name;
@@ -30,6 +34,56 @@ public class CompanySeedData {
             this.logo = logo;
             this.url = url;
             this.status = "ACTIVE";
+            enrichCompanyEligibility(this);
+        }
+    }
+
+    public static void enrichCompanyEligibility(CompanyDef c) {
+        String lowerName = c.name != null ? c.name.toLowerCase() : "";
+        String lowerRole = c.role != null ? c.role.toLowerCase() : "";
+
+        if (lowerName.contains("tata consultancy") || lowerName.contains("infosys") || lowerName.contains("wipro") 
+            || lowerName.contains("accenture") || lowerName.contains("cognizant") || lowerName.contains("tech mahindra")
+            || lowerName.contains("hcl") || lowerName.contains("dxc") || lowerName.contains("hexaware") || lowerName.contains("mphasis")
+            || lowerName.contains("capgemini") || lowerName.contains("ltimindtree") || lowerName.contains("persistent")) {
+            c.requiredDegree = "B.Tech / B.E., MCA, BCA, B.Sc, M.Tech";
+            c.eligibleBranches = "All Engineering Branches (CSE, IT, ECE, EEE, Mechanical, Civil)";
+            c.minQualification = "Bachelor's Degree";
+            c.location = "Pan India / Hybrid";
+        } else if (lowerName.contains("qualcomm") || lowerName.contains("intel") || lowerName.contains("nvidia") 
+                   || lowerName.contains("broadcom") || lowerName.contains("texas instruments") || lowerName.contains("amd")
+                   || lowerName.contains("micron") || lowerName.contains("arm") || lowerName.contains("bosch") || lowerName.contains("siemens")
+                   || lowerName.contains("western digital") || lowerName.contains("sony")) {
+            c.requiredDegree = "B.Tech / B.E., M.Tech, MS";
+            c.eligibleBranches = "Electronics & Communication, Electrical Engineering, Computer Science, Embedded Systems";
+            c.minQualification = "Bachelor's Degree";
+            c.location = "Bangalore, Hyderabad, Noida";
+        } else if (lowerRole.contains("data analyst") || lowerRole.contains("consultant") || lowerRole.contains("analytics") || lowerRole.contains("advisory")
+                   || lowerName.contains("mckinsey") || lowerName.contains("boston consulting") || lowerName.contains("bain")) {
+            c.requiredDegree = "B.Tech / B.E., MCA, B.Sc (Comp/Math/Stats), M.Sc, MBA";
+            c.eligibleBranches = "Computer Science, Information Technology, Data Science / AI, Mathematics, All Engineering Branches";
+            c.minQualification = "Bachelor's Degree";
+            c.location = "Mumbai, Bangalore, Hyderabad, Gurgaon";
+        } else if (lowerName.contains("goldman") || lowerName.contains("morgan stanley") || lowerName.contains("jpmorgan") 
+                   || lowerName.contains("barclays") || lowerName.contains("citi") || lowerName.contains("deutsche") || lowerName.contains("hsbc")
+                   || lowerName.contains("standard chartered") || lowerName.contains("bnp paribas") || lowerName.contains("bank of america") || lowerName.contains("wells fargo")) {
+            c.requiredDegree = "B.Tech / B.E., M.Tech, MCA, M.Sc (Math/CS)";
+            c.eligibleBranches = "Computer Science, Information Technology, Data Science / AI, All Engineering Branches";
+            c.minQualification = "Bachelor's Degree";
+            c.location = "Bangalore, Mumbai, Hyderabad";
+        } else if (lowerName.contains("google") || lowerName.contains("microsoft") || lowerName.contains("amazon") 
+                   || lowerName.contains("meta") || lowerName.contains("apple") || lowerName.contains("netflix") || lowerName.contains("uber")
+                   || lowerName.contains("stripe") || lowerName.contains("atlassian") || lowerName.contains("adobe") || lowerName.contains("salesforce")
+                   || lowerName.contains("linkedin") || lowerName.contains("twitter") || lowerName.contains("pinterest") || lowerName.contains("reddit")) {
+            c.requiredDegree = "B.Tech / B.E., M.Tech, MCA, MS";
+            c.eligibleBranches = "Computer Science, Information Technology, Electronics & Communication, Data Science / AI";
+            c.minQualification = "Bachelor's Degree";
+            c.location = "Bangalore, Hyderabad, Gurgaon";
+        } else {
+            c.requiredDegree = "B.Tech / B.E., M.Tech, MCA";
+            c.eligibleBranches = "Computer Science, Information Technology, Electronics & Communication";
+            c.minQualification = "Bachelor's Degree";
+            c.location = "Bangalore, Pune, Hyderabad, Remote / Hybrid";
         }
     }
 
@@ -159,9 +213,9 @@ public class CompanySeedData {
         if (conn == null) return;
         try {
             List<CompanyDef> companies = getFullCompanyList();
-            String checkSql = "SELECT id, logo FROM companies WHERE LOWER(company_name) = ?";
-            String insertSql = "INSERT INTO companies (company_name, skills, role, salary, experience, description, logo, apply_url, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
-            String updateSql = "UPDATE companies SET skills = ?, role = ?, salary = ?, experience = ?, description = ?, logo = ?, apply_url = ?, status = ? WHERE id = ?";
+            String checkSql = "SELECT id, logo, required_degree FROM companies WHERE LOWER(company_name) = ?";
+            String insertSql = "INSERT INTO companies (company_name, skills, role, salary, experience, description, logo, apply_url, status, required_degree, eligible_branches, min_qualification, location) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            String updateSql = "UPDATE companies SET required_degree = ?, eligible_branches = ?, min_qualification = ?, location = ? WHERE id = ?";
 
             // Also ensure Capgemini and Cisco logos are set if they were previously default
             try (PreparedStatement psUpdate = conn.prepareStatement(
@@ -189,6 +243,15 @@ public class CompanySeedData {
                                     psUp.executeUpdate();
                                 }
                             }
+                            // Update qualification, branch, and location if needed
+                            try (PreparedStatement psUpQual = conn.prepareStatement(updateSql)) {
+                                psUpQual.setString(1, c.requiredDegree);
+                                psUpQual.setString(2, c.eligibleBranches);
+                                psUpQual.setString(3, c.minQualification);
+                                psUpQual.setString(4, c.location);
+                                psUpQual.setInt(5, id);
+                                psUpQual.executeUpdate();
+                            }
                         } else {
                             try (PreparedStatement psIns = conn.prepareStatement(insertSql)) {
                                 psIns.setString(1, c.name);
@@ -200,6 +263,10 @@ public class CompanySeedData {
                                 psIns.setString(7, c.logo);
                                 psIns.setString(8, c.url);
                                 psIns.setString(9, c.status);
+                                psIns.setString(10, c.requiredDegree);
+                                psIns.setString(11, c.eligibleBranches);
+                                psIns.setString(12, c.minQualification);
+                                psIns.setString(13, c.location);
                                 psIns.executeUpdate();
                             }
                         }

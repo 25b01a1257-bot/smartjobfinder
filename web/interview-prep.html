@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Interview Preparation & Mock Interview - Smart Job Finder</title>
+    <link rel="stylesheet" href="css/style.css?v=20260922_v1">
+    <style>
+        .interview-prep-layout {
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            gap: 24px;
+            align-items: flex-start;
+        }
+        @media (max-width: 860px) {
+            .interview-prep-layout { grid-template-columns: 1fr; }
+        }
+        .prep-sidebar-card {
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 24px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+        }
+        .prep-tabs-bar {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 12px;
+            overflow-x: auto;
+        }
+        .prep-tab-btn {
+            background: none;
+            border: none;
+            font-size: 14px;
+            font-weight: 700;
+            color: #64748b;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+        .prep-tab-btn:hover {
+            color: var(--primary);
+            background: #f1f5f9;
+        }
+        .prep-tab-btn.active {
+            color: #ffffff;
+            background: var(--primary);
+        }
+        .question-card {
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+            transition: all 0.2s ease;
+        }
+        .question-card:hover {
+            border-color: #cbd5e1;
+            box-shadow: 0 6px 14px rgba(0,0,0,0.05);
+        }
+        .q-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 12px;
+            margin-bottom: 10px;
+        }
+        .q-type-badge {
+            font-size: 11px;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .q-tech { background: #eff6ff; color: #1d4ed8; }
+        .q-hr { background: #ecfdf5; color: #047857; }
+        .q-role { background: #faf5ff; color: #7c3aed; }
+        .q-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-main);
+            margin: 0;
+            line-height: 1.4;
+        }
+        .sample-answer-box {
+            background: #f8fafc;
+            border-left: 3px solid var(--primary);
+            border-radius: 0 8px 8px 0;
+            padding: 12px 16px;
+            font-size: 13px;
+            color: #334155;
+            line-height: 1.6;
+            margin-top: 12px;
+            display: none;
+        }
+        .mock-answer-section {
+            margin-top: 14px;
+            padding-top: 14px;
+            border-top: 1px solid #f1f5f9;
+        }
+        .mock-textarea {
+            width: 100%;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            padding: 10px 12px;
+            font-size: 13px;
+            margin-bottom: 8px;
+            outline: none;
+            resize: vertical;
+        }
+        .mock-feedback-box {
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            border-radius: 8px;
+            padding: 14px;
+            margin-top: 10px;
+            font-size: 13px;
+            line-height: 1.6;
+            color: #14532d;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <header class="app-header">
+        <div class="header-content">
+            <a href="index.html" class="logo-title">
+                <span class="logo-icon">⚡</span>
+                <h1>Smart Job Finder</h1>
+            </a>
+            <div class="header-nav-links">
+                <a href="job-search.html" class="nav-link">🔍 Job Search</a>
+                <a href="application-tracker.html" class="nav-link">📊 Application Tracker</a>
+                <a href="profile.html" class="nav-link">👤 My Profile</a>
+                <a href="career-assistant.html" class="nav-link">🤖 AI Assistant</a>
+                <a href="interview-prep.html" class="nav-link active">🎯 Interview Prep</a>
+            </div>
+            <div class="header-actions">
+                <span id="userGreeting" class="user-greeting-pill" style="display:none;">👋 Hello</span>
+                <a href="logout" class="btn btn-outline btn-sm">Sign Out</a>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-container" style="max-width: 1100px; margin-top: 24px;">
+        <div class="page-title-banner" style="margin-bottom: 24px;">
+            <div style="display: inline-flex; align-items: center; gap: 6px; background: #ecfdf5; color: #059669; padding: 4px 12px; border-radius: 9999px; font-size: 12px; font-weight: 700; margin-bottom: 8px;">
+                🎯 AI Interview Preparation &amp; Mock Evaluation
+            </div>
+            <h2 style="font-size: 28px; font-weight: 800; color: var(--text-main); margin: 0 0 6px 0;">Targeted Interview Questions &amp; Practice</h2>
+            <p style="font-size: 14px; color: var(--text-muted); margin: 0;">Prepare role-specific technical questions, HR behavioral scenarios, and test your answers with instant AI feedback.</p>
+        </div>
+
+        <div class="interview-prep-layout">
+            <!-- Sidebar: Parameters -->
+            <aside class="prep-sidebar-card">
+                <h3 style="font-size: 18px; font-weight: 700; margin: 0 0 16px 0; color: var(--text-main);">
+                    🏢 Target Opening
+                </h3>
+
+                <div class="form-group" style="margin-bottom: 14px;">
+                    <label for="prepRole" style="display: block; font-size: 13px; font-weight: 700; margin-bottom: 4px;">Target Job Role *</label>
+                    <input type="text" id="prepRole" class="form-control" value="Software Engineer" placeholder="e.g. Software Engineer, Data Analyst">
+                </div>
+
+                <div class="form-group" style="margin-bottom: 14px;">
+                    <label for="prepCompany" style="display: block; font-size: 13px; font-weight: 700; margin-bottom: 4px;">Target Company (Optional)</label>
+                    <input type="text" id="prepCompany" class="form-control" placeholder="e.g. Google, TCS, Infosys, Amazon">
+                </div>
+
+                <div class="form-group" style="margin-bottom: 14px;">
+                    <label for="prepSkills" style="display: block; font-size: 13px; font-weight: 700; margin-bottom: 4px;">Key Technical Skills</label>
+                    <input type="text" id="prepSkills" class="form-control" value="Java, SQL, Spring Boot, DSA" placeholder="e.g. Java, Python, SQL">
+                </div>
+
+                <div class="form-group" style="margin-bottom: 20px;">
+                    <label for="prepExp" style="display: block; font-size: 13px; font-weight: 700; margin-bottom: 4px;">Candidate Experience</label>
+                    <select id="prepExp" class="form-control">
+                        <option value="0-1">Fresher / 0-1 yr</option>
+                        <option value="1-3" selected>1-3 yrs</option>
+                        <option value="3-5">3-5 yrs</option>
+                    </select>
+                </div>
+
+                <button type="button" class="btn btn-primary" style="width: 100%;" onclick="loadQuestions()">
+                    ⚡ Generate Questions
+                </button>
+            </aside>
+
+            <!-- Main Content: Questions Tabs & Mock Interview -->
+            <section>
+                <div class="prep-tabs-bar">
+                    <button class="prep-tab-btn active" data-category="ALL" onclick="filterCategory('ALL', this)">All Questions (15)</button>
+                    <button class="prep-tab-btn" data-category="technical" onclick="filterCategory('technical', this)">💻 Technical (5)</button>
+                    <button class="prep-tab-btn" data-category="hr" onclick="filterCategory('hr', this)">🤝 HR &amp; Behavioral (5)</button>
+                    <button class="prep-tab-btn" data-category="role" onclick="filterCategory('role', this)">💼 Role-Specific (5)</button>
+                </div>
+
+                <div id="questionsContainer">
+                    <!-- Populated dynamically via JS -->
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <script src="js/script.js?v=20260922_v1"></script>
+    <script>
+        let currentCategory = 'ALL';
+        let questionData = [];
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Check query params for role and company
+            const urlParams = new URLSearchParams(window.location.search);
+            const role = urlParams.get('role');
+            const company = urlParams.get('company');
+            if (role) document.getElementById('prepRole').value = role;
+            if (company) document.getElementById('prepCompany').value = company;
+
+            loadQuestions();
+        });
+
+        function loadQuestions() {
+            const role = document.getElementById('prepRole').value.trim() || 'Software Engineer';
+            const company = document.getElementById('prepCompany').value.trim();
+            const skills = document.getElementById('prepSkills').value.trim();
+            const exp = document.getElementById('prepExp').value;
+
+            const container = document.getElementById('questionsContainer');
+            container.innerHTML = '<div style="text-align: center; padding: 40px; color: var(--text-muted);"><div class="results-loading-spinner" style="margin: 0 auto 12px auto;"></div><p>Curating role and skill-specific questions...</p></div>';
+
+            const params = new URLSearchParams();
+            params.append('role', role);
+            params.append('company', company);
+            params.append('skills', skills);
+            params.append('experience', exp);
+
+            fetch('api/interview-prep?' + params.toString(), {
+                method: 'GET',
+                headers: { 'Accept': 'application/json' }
+            })
+            .then(res => res.json())
+            .then(data => {
+                questionData = data.questions || [];
+                renderQuestions();
+            })
+            .catch(err => {
+                console.error(err);
+                container.innerHTML = '<div class="alert-banner error" style="display:block;">Error fetching questions. Please try again.</div>';
+            });
+        }
+
+        function filterCategory(cat, btn) {
+            currentCategory = cat;
+            document.querySelectorAll('.prep-tab-btn').forEach(b => b.classList.remove('active'));
+            if (btn) btn.classList.add('active');
+            renderQuestions();
+        }
+
+        function renderQuestions() {
+            const container = document.getElementById('questionsContainer');
+            if (!container) return;
+
+            const filtered = currentCategory === 'ALL'
+                ? questionData
+                : questionData.filter(q => (q.category || '').toLowerCase() === currentCategory.toLowerCase());
+
+            if (filtered.length === 0) {
+                container.innerHTML = '<div class="no-results-card" style="padding: 30px; text-align: center;"><p>No questions found for this category.</p></div>';
+                return;
+            }
+
+            let html = '';
+            filtered.forEach((q, idx) => {
+                const catLower = (q.category || 'tech').toLowerCase();
+                const badgeClass = catLower === 'technical' ? 'q-tech' : (catLower === 'hr' ? 'q-hr' : 'q-role');
+
+                html += `
+                    <div class="question-card" id="qCard_${idx}">
+                        <div class="q-header">
+                            <div>
+                                <span class="q-type-badge ${badgeClass}">${escapeHtml(q.category || 'Interview')}</span>
+                                <h4 class="q-title" style="margin-top: 6px;">${idx + 1}. ${escapeHtml(q.question)}</h4>
+                            </div>
+                        </div>
+
+                        <div style="display: flex; gap: 8px; margin-top: 10px;">
+                            <button type="button" class="btn btn-secondary btn-sm" onclick="toggleSampleAnswer(${idx})">
+                                💡 View Sample Answer
+                            </button>
+                            <button type="button" class="btn btn-outline btn-sm" onclick="toggleMockMode(${idx})">
+                                🎙️ Practice Mock Answer
+                            </button>
+                        </div>
+
+                        <div id="sampleAnswer_${idx}" class="sample-answer-box">
+                            <strong>⭐ Ideal Answer Framework:</strong>
+                            <p style="margin: 6px 0 0 0;">${escapeHtml(q.sampleAnswer)}</p>
+                        </div>
+
+                        <div id="mockSection_${idx}" class="mock-answer-section" style="display: none;">
+                            <label style="display: block; font-size: 12px; font-weight: 700; margin-bottom: 4px; color: #475569;">
+                                Type your answer here to receive instant AI evaluation &amp; scoring:
+                            </label>
+                            <textarea id="mockInput_${idx}" class="mock-textarea" rows="3" placeholder="Explain your approach, key technical concepts, or STAR method answer..."></textarea>
+                            <button type="button" class="btn btn-primary btn-sm" onclick="evaluateAnswer(${idx}, '${escapeJs(q.question)}', '${escapeJs(q.category)}')">
+                                🤖 Evaluate My Answer
+                            </button>
+                            <div id="mockFeedback_${idx}" class="mock-feedback-box"></div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+        }
+
+        function toggleSampleAnswer(idx) {
+            const el = document.getElementById('sampleAnswer_' + idx);
+            if (el) {
+                el.style.display = (el.style.display === 'none' || !el.style.display) ? 'block' : 'none';
+            }
+        }
+
+        function toggleMockMode(idx) {
+            const el = document.getElementById('mockSection_' + idx);
+            if (el) {
+                el.style.display = (el.style.display === 'none' || !el.style.display) ? 'block' : 'none';
+            }
+        }
+
+        function evaluateAnswer(idx, question, category) {
+            const answerInput = document.getElementById('mockInput_' + idx);
+            const feedbackBox = document.getElementById('mockFeedback_' + idx);
+            const answer = answerInput ? answerInput.value.trim() : '';
+
+            if (!answer) {
+                alert('Please type an answer first before requesting evaluation.');
+                return;
+            }
+
+            feedbackBox.style.display = 'block';
+            feedbackBox.innerHTML = '<span style="color:#6366f1;">⏳ Evaluating your response against industry benchmarks...</span>';
+
+            const role = document.getElementById('prepRole').value.trim() || 'Software Engineer';
+
+            const params = new URLSearchParams();
+            params.append('action', 'evaluate');
+            params.append('question', question);
+            params.append('answer', answer);
+            params.append('role', role);
+            params.append('category', category);
+
+            fetch('api/interview-prep', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: params.toString()
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.evaluation) {
+                    const ev = data.evaluation;
+                    let strengthsHtml = (ev.strengths || []).map(s => `<li>✓ ${escapeHtml(s)}</li>`).join('');
+                    let improveHtml = (ev.improvements || []).map(i => `<li>▲ ${escapeHtml(i)}</li>`).join('');
+
+                    feedbackBox.innerHTML = `
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                            <strong>🎯 Evaluation Score: ${ev.score || 8} / 10</strong>
+                            <span style="font-size:12px; background:#dcfce7; color:#166534; padding:2px 8px; border-radius:4px; font-weight:700;">AI Verified</span>
+                        </div>
+                        <p style="margin:0 0 8px 0;">${escapeHtml(ev.feedback || '')}</p>
+                        <div style="font-size:12px; margin-top:6px;">
+                            <strong>Strengths:</strong>
+                            <ul style="margin:2px 0 6px 0; padding-left:18px;">${strengthsHtml}</ul>
+                            <strong>Key Areas for Improvement:</strong>
+                            <ul style="margin:2px 0 0 0; padding-left:18px;">${improveHtml}</ul>
+                        </div>
+                    `;
+                } else {
+                    feedbackBox.innerHTML = '⚠️ Evaluation completed with general feedback.';
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                feedbackBox.innerHTML = '❌ Error communicating with evaluation engine.';
+            });
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        }
+
+        function escapeJs(str) {
+            if (!str) return '';
+            return String(str).replace(/'/g, "\\'");
+        }
+    </script>
+</body>
+</html>

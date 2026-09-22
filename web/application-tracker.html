@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Application Tracker - Smart Job Finder</title>
+    <link rel="stylesheet" href="css/style.css?v=20260922_v1">
+    <style>
+        .tracker-header-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 16px;
+            margin-bottom: 28px;
+        }
+        .tracker-stat-card {
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 18px 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.03);
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .tracker-stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.06);
+        }
+        .tracker-stat-icon {
+            font-size: 28px;
+            width: 48px;
+            height: 48px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f1f5f9;
+        }
+        .stat-icon-blue { background: #eff6ff; color: #2563eb; }
+        .stat-icon-green { background: #ecfdf5; color: #059669; }
+        .stat-icon-amber { background: #fffbeb; color: #d97706; }
+        .stat-icon-purple { background: #faf5ff; color: #7c3aed; }
+        .stat-icon-red { background: #fef2f2; color: #dc2626; }
+        .tracker-stat-info h4 {
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--text-main);
+            margin: 0 0 2px 0;
+        }
+        .tracker-stat-info p {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin: 0;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .tracker-filter-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 14px;
+            margin-bottom: 20px;
+            background: #ffffff;
+            padding: 14px 20px;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+        }
+        .tracker-status-tabs {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .status-tab-btn {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 9999px;
+            padding: 6px 14px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .status-tab-btn:hover {
+            background: #e2e8f0;
+            color: var(--text-main);
+        }
+        .status-tab-btn.active {
+            background: var(--primary);
+            color: #ffffff;
+            border-color: var(--primary);
+        }
+        .app-tracker-card {
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 22px 24px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+            transition: all 0.2s ease;
+        }
+        .app-tracker-card:hover {
+            box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+            border-color: #cbd5e1;
+        }
+        .app-tracker-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 16px;
+            flex-wrap: wrap;
+            margin-bottom: 12px;
+        }
+        .app-tracker-company {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+        .app-company-logo {
+            width: 48px;
+            height: 48px;
+            object-fit: contain;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 4px;
+            background: #ffffff;
+        }
+        .app-company-details h3 {
+            margin: 0;
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+        .app-company-details p {
+            margin: 3px 0 0 0;
+            font-size: 14px;
+            color: var(--secondary);
+            font-weight: 600;
+        }
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            border-radius: 9999px;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .status-saved { background: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; }
+        .status-applied { background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; }
+        .status-interview { background: #faf5ff; color: #7c3aed; border: 1px solid #ddd6fe; }
+        .status-shortlisted { background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; }
+        .status-offer { background: #f0fdf4; color: #15803d; border: 1.5px solid #86efac; font-weight: 800; }
+        .status-rejected { background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; }
+        .status-withdrawn { background: #f8fafc; color: #64748b; border: 1px solid #e2e8f0; }
+        .tracker-meta-row {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            font-size: 13px;
+            color: var(--text-muted);
+            margin: 12px 0;
+            padding: 10px 14px;
+            background: #f8fafc;
+            border-radius: 8px;
+        }
+        .tracker-meta-item strong {
+            color: var(--text-main);
+        }
+        .tracker-notes-box {
+            font-size: 13px;
+            color: #334155;
+            background: #fffdf5;
+            border-left: 3px solid #f59e0b;
+            padding: 10px 14px;
+            border-radius: 0 8px 8px 0;
+            margin: 10px 0 14px 0;
+        }
+        .tracker-actions-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            padding-top: 12px;
+            border-top: 1px solid #f1f5f9;
+        }
+        .tracker-btn-group {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+        .btn-edit-status {
+            background: #f1f5f9;
+            color: #334155;
+            border: 1px solid #cbd5e1;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-edit-status:hover {
+            background: #e2e8f0;
+        }
+        .btn-delete-app {
+            background: #fff1f2;
+            color: #e11d48;
+            border: 1px solid #fecdd3;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-delete-app:hover {
+            background: #ffe4e6;
+        }
+    </style>
+</head>
+<body>
+
+    <header class="app-header">
+        <div class="header-content">
+            <a href="index.html" class="logo-title">
+                <span class="logo-icon">⚡</span>
+                <h1>Smart Job Finder</h1>
+            </a>
+            <div class="header-nav-links">
+                <a href="job-search.html" class="nav-link">🔍 Job Search</a>
+                <a href="application-tracker.html" class="nav-link active">📊 Application Tracker</a>
+                <a href="profile.html" class="nav-link">👤 My Profile</a>
+                <a href="career-assistant.html" class="nav-link">🤖 AI Assistant</a>
+                <a href="interview-prep.html" class="nav-link">🎯 Interview Prep</a>
+            </div>
+            <div class="header-actions">
+                <span id="userGreeting" class="user-greeting-pill" style="display:none;">👋 Hello</span>
+                <a href="logout" class="btn btn-outline btn-sm">Sign Out</a>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-container" style="max-width: 1040px; margin-top: 24px;">
+        <div class="page-title-banner" style="margin-bottom: 24px;">
+            <div style="display: inline-flex; align-items: center; gap: 6px; background: #e0f2fe; color: #0284c7; padding: 4px 12px; border-radius: 9999px; font-size: 12px; font-weight: 700; margin-bottom: 8px;">
+                📋 Student Application Management System
+            </div>
+            <h2 style="font-size: 28px; font-weight: 800; color: var(--text-main); margin: 0 0 6px 0;">My Application Tracker</h2>
+            <p style="font-size: 14px; color: var(--text-muted); margin: 0;">Keep track of jobs you saved, official company applications you submitted, interview rounds, and offers.</p>
+        </div>
+
+        <!-- Alert Banner -->
+        <div id="trackerAlert" class="alert-banner" style="display: none;"></div>
+
+        <!-- Top KPIs -->
+        <section class="tracker-header-stats">
+            <div class="tracker-stat-card">
+                <div class="tracker-stat-icon stat-icon-blue">📁</div>
+                <div class="tracker-stat-info">
+                    <h4 id="statTotal">0</h4>
+                    <p>Total Tracked</p>
+                </div>
+            </div>
+            <div class="tracker-stat-card">
+                <div class="tracker-stat-icon stat-icon-amber">💾</div>
+                <div class="tracker-stat-info">
+                    <h4 id="statSaved">0</h4>
+                    <p>Saved Jobs</p>
+                </div>
+            </div>
+            <div class="tracker-stat-card">
+                <div class="tracker-stat-icon stat-icon-blue">📤</div>
+                <div class="tracker-stat-info">
+                    <h4 id="statApplied">0</h4>
+                    <p>Applied</p>
+                </div>
+            </div>
+            <div class="tracker-stat-card">
+                <div class="tracker-stat-icon stat-icon-purple">🎯</div>
+                <div class="tracker-stat-info">
+                    <h4 id="statInterview">0</h4>
+                    <p>In Interview</p>
+                </div>
+            </div>
+            <div class="tracker-stat-card">
+                <div class="tracker-stat-icon stat-icon-green">🎉</div>
+                <div class="tracker-stat-info">
+                    <h4 id="statOffer">0</h4>
+                    <p>Offers Received</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Filter Bar -->
+        <div class="tracker-filter-bar">
+            <div class="tracker-status-tabs">
+                <button class="status-tab-btn active" data-status="ALL" onclick="filterTrackerByStatus('ALL', this)">All Applications (<span id="countAll">0</span>)</button>
+                <button class="status-tab-btn" data-status="Saved" onclick="filterTrackerByStatus('Saved', this)">Saved (<span id="countSaved">0</span>)</button>
+                <button class="status-tab-btn" data-status="Applied" onclick="filterTrackerByStatus('Applied', this)">Applied (<span id="countApplied">0</span>)</button>
+                <button class="status-tab-btn" data-status="Interview" onclick="filterTrackerByStatus('Interview', this)">Interview (<span id="countInterview">0</span>)</button>
+                <button class="status-tab-btn" data-status="Shortlisted" onclick="filterTrackerByStatus('Shortlisted', this)">Shortlisted (<span id="countShortlisted">0</span>)</button>
+                <button class="status-tab-btn" data-status="Offer" onclick="filterTrackerByStatus('Offer', this)">Offer (<span id="countOffer">0</span>)</button>
+                <button class="status-tab-btn" data-status="Rejected" onclick="filterTrackerByStatus('Rejected', this)">Rejected (<span id="countRejected">0</span>)</button>
+                <button class="status-tab-btn" data-status="Withdrawn" onclick="filterTrackerByStatus('Withdrawn', this)">Withdrawn (<span id="countWithdrawn">0</span>)</button>
+            </div>
+            <div>
+                <a href="job-search.html" class="btn btn-primary btn-sm" style="display: inline-flex; align-items: center; gap: 6px;">
+                    ➕ Find &amp; Apply More Jobs
+                </a>
+            </div>
+        </div>
+
+        <!-- Application Cards Container -->
+        <div id="applicationsContainer">
+            <div id="trackerLoading" style="text-align: center; padding: 40px; color: var(--text-muted);">
+                <div class="results-loading-spinner" style="margin: 0 auto 12px auto;"></div>
+                <p>Loading your private application records...</p>
+            </div>
+        </div>
+
+        <!-- Empty State -->
+        <div id="emptyTrackerState" class="no-results-card" style="display: none; padding: 48px 24px; text-align: center; background: #ffffff; border: 1px solid var(--border-color); border-radius: 14px;">
+            <div style="font-size: 44px; margin-bottom: 12px;">📂</div>
+            <h3 style="font-size: 20px; color: var(--text-main); margin-bottom: 6px;">No Applications In This Category</h3>
+            <p style="font-size: 14px; color: var(--text-muted); max-width: 480px; margin: 0 auto 20px auto;">
+                When you click <strong>Apply Now</strong> on any job card, you can mark the job as Applied or Saved to monitor follow-ups, interview dates, and recruiter status here.
+            </p>
+            <a href="job-search.html" class="btn btn-primary">🔍 Explore Job Openings</a>
+        </div>
+    </main>
+
+    <!-- Edit Status & Notes Modal -->
+    <div id="editApplicationModal" class="ai-modal-overlay" style="display: none;">
+        <div class="ai-modal-card" style="max-width: 520px;">
+            <button type="button" class="ai-modal-close" onclick="closeEditModal()">✕</button>
+            <div style="margin-bottom: 18px;">
+                <h3 style="margin: 0 0 4px 0; font-size: 20px; color: var(--text-main);" id="modalEditTitle">Update Application Status</h3>
+                <p style="margin: 0; font-size: 13px; color: var(--text-muted);" id="modalEditSubtitle">Update recruiter progress, interview dates, and notes.</p>
+            </div>
+            <input type="hidden" id="editAppId" value="">
+            
+            <div class="form-group" style="margin-bottom: 14px;">
+                <label for="editStatusSelect" style="display: block; font-size: 13px; font-weight: 700; margin-bottom: 6px;">Application Status *</label>
+                <select id="editStatusSelect" class="form-control" style="font-weight: 600;">
+                    <option value="Saved">💾 Saved</option>
+                    <option value="Applied">📤 Applied</option>
+                    <option value="Interview">🎯 In Interview</option>
+                    <option value="Shortlisted">⭐ Shortlisted</option>
+                    <option value="Offer">🎉 Offer Received</option>
+                    <option value="Rejected">❌ Rejected</option>
+                    <option value="Withdrawn">⏸️ Withdrawn</option>
+                </select>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 14px;">
+                <label for="editFollowUpDate" style="display: block; font-size: 13px; font-weight: 700; margin-bottom: 6px;">Follow-up / Next Round Date</label>
+                <input type="date" id="editFollowUpDate" class="form-control">
+            </div>
+
+            <div class="form-group" style="margin-bottom: 20px;">
+                <label for="editNotes" style="display: block; font-size: 13px; font-weight: 700; margin-bottom: 6px;">Application Notes &amp; Contacts</label>
+                <textarea id="editNotes" class="form-control" rows="3" placeholder="e.g. Applied via Workday; HR interview scheduled for Friday; round 1 DSA cleared..."></textarea>
+            </div>
+
+            <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                <button type="button" class="btn btn-secondary" onclick="closeEditModal()">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="saveApplicationUpdate()">Save Updates</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/script.js?v=20260922_v1"></script>
+    <script>
+        let allApplications = [];
+        let currentFilter = 'ALL';
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadApplications();
+        });
+
+        function loadApplications() {
+            const container = document.getElementById('applicationsContainer');
+            const loading = document.getElementById('trackerLoading');
+            if (loading) loading.style.display = 'block';
+
+            fetch('api/applications', {
+                method: 'GET',
+                headers: { 'Accept': 'application/json' }
+            })
+            .then(res => {
+                if (res.status === 401) {
+                    window.location.href = 'login.html?error=' + encodeURIComponent('Please log in to view your application tracker.');
+                    return null;
+                }
+                if (!res.ok) throw new Error('HTTP ' + res.status);
+                return res.json();
+            })
+            .then(data => {
+                if (loading) loading.style.display = 'none';
+                if (!data) return;
+
+                if (data.authenticated && data.userName) {
+                    const greet = document.getElementById('userGreeting');
+                    if (greet) {
+                        greet.textContent = '👋 ' + data.userName;
+                        greet.style.display = 'inline-block';
+                    }
+                }
+
+                allApplications = data.applications || [];
+                updateStats();
+                renderApplications();
+            })
+            .catch(err => {
+                console.error('Error loading applications:', err);
+                if (loading) loading.style.display = 'none';
+                showTrackerAlert('Could not load applications. Please ensure you are logged in.', 'error');
+            });
+        }
+
+        function updateStats() {
+            let total = allApplications.length;
+            let saved = 0, applied = 0, interview = 0, shortlisted = 0, offer = 0, rejected = 0, withdrawn = 0;
+
+            allApplications.forEach(a => {
+                const s = (a.status || '').toLowerCase();
+                if (s === 'saved') saved++;
+                else if (s === 'applied') applied++;
+                else if (s === 'interview') interview++;
+                else if (s === 'shortlisted') shortlisted++;
+                else if (s === 'offer') offer++;
+                else if (s === 'rejected') rejected++;
+                else if (s === 'withdrawn') withdrawn++;
+            });
+
+            document.getElementById('statTotal').textContent = total;
+            document.getElementById('statSaved').textContent = saved;
+            document.getElementById('statApplied').textContent = applied;
+            document.getElementById('statInterview').textContent = interview;
+            document.getElementById('statOffer').textContent = offer;
+
+            document.getElementById('countAll').textContent = total;
+            document.getElementById('countSaved').textContent = saved;
+            document.getElementById('countApplied').textContent = applied;
+            document.getElementById('countInterview').textContent = interview;
+            document.getElementById('countShortlisted').textContent = shortlisted;
+            document.getElementById('countOffer').textContent = offer;
+            document.getElementById('countRejected').textContent = rejected;
+            document.getElementById('countWithdrawn').textContent = withdrawn;
+        }
+
+        function filterTrackerByStatus(status, btn) {
+            currentFilter = status;
+            document.querySelectorAll('.status-tab-btn').forEach(b => b.classList.remove('active'));
+            if (btn) btn.classList.add('active');
+            renderApplications();
+        }
+
+        function renderApplications() {
+            const container = document.getElementById('applicationsContainer');
+            const emptyState = document.getElementById('emptyTrackerState');
+            if (!container) return;
+
+            const filtered = currentFilter === 'ALL'
+                ? allApplications
+                : allApplications.filter(a => (a.status || '').toLowerCase() === currentFilter.toLowerCase());
+
+            if (filtered.length === 0) {
+                container.innerHTML = '';
+                if (emptyState) emptyState.style.display = 'block';
+                return;
+            }
+
+            if (emptyState) emptyState.style.display = 'none';
+
+            let html = '';
+            filtered.forEach(app => {
+                const statusLower = (app.status || 'saved').toLowerCase();
+                const statusClass = 'status-' + statusLower;
+                const dateApplied = app.appliedDate || 'Not specified';
+                const followUp = app.followUpDate ? app.followUpDate : 'None scheduled';
+                const hasUrl = app.officialUrl && app.officialUrl !== '#' && app.officialUrl.startsWith('http');
+
+                html += `
+                    <div class="app-tracker-card" id="appCard_${app.id}">
+                        <div class="app-tracker-header">
+                            <div class="app-tracker-company">
+                                <img src="images/default-company.svg" alt="${escapeHtml(app.companyName)}" class="app-company-logo">
+                                <div class="app-company-details">
+                                    <h3>${escapeHtml(app.companyName)}</h3>
+                                    <p>${escapeHtml(app.jobTitle || 'Job Opening')}</p>
+                                </div>
+                            </div>
+                            <div>
+                                <span class="status-badge ${statusClass}">${escapeHtml(app.status || 'Saved')}</span>
+                            </div>
+                        </div>
+
+                        <div class="tracker-meta-row">
+                            <div class="tracker-meta-item">📅 Applied Date: <strong>${escapeHtml(dateApplied)}</strong></div>
+                            <div class="tracker-meta-item">⏰ Follow-up Date: <strong>${escapeHtml(followUp)}</strong></div>
+                            ${hasUrl ? `<div class="tracker-meta-item">🔗 Portal: <a href="${escapeHtml(app.officialUrl)}" target="_blank" rel="noopener noreferrer" style="color: #2563eb; font-weight: 600;">Official Careers Page ↗</a></div>` : ''}
+                        </div>
+
+                        ${app.notes && app.notes.trim() ? `
+                            <div class="tracker-notes-box">
+                                📝 <strong>Notes:</strong> ${escapeHtml(app.notes)}
+                            </div>
+                        ` : ''}
+
+                        <div class="tracker-actions-bar">
+                            <div style="font-size: 12px; color: var(--text-muted);">
+                                ID: #${app.id} • Last Updated: ${escapeHtml(app.updatedAt || app.createdAt || 'Recent')}
+                            </div>
+                            <div class="tracker-btn-group">
+                                ${hasUrl ? `
+                                    <a href="${escapeHtml(app.officialUrl)}" target="_blank" rel="noopener noreferrer" class="btn-edit-status" style="text-decoration:none;">
+                                        🌐 Revisit Portal ↗
+                                    </a>
+                                ` : ''}
+                                <a href="interview-prep.html?role=${encodeURIComponent(app.jobTitle || '')}&company=${encodeURIComponent(app.companyName || '')}" class="btn-edit-status" style="text-decoration:none; background:#ede9fe; color:#6d28d9; border-color:#ddd6fe;">
+                                    🎯 Prep Interview
+                                </a>
+                                <button type="button" class="btn-edit-status" onclick="openEditModal(${app.id})">
+                                    ✏️ Update Status &amp; Notes
+                                </button>
+                                <button type="button" class="btn-delete-app" onclick="deleteApplication(${app.id}, '${escapeJs(app.companyName)}')">
+                                    🗑️ Delete
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+        }
+
+        function openEditModal(appId) {
+            const app = allApplications.find(a => a.id === appId);
+            if (!app) return;
+
+            document.getElementById('editAppId').value = app.id;
+            document.getElementById('modalEditTitle').textContent = `Update Status: ${app.companyName}`;
+            document.getElementById('modalEditSubtitle').textContent = app.jobTitle || 'Application';
+            document.getElementById('editStatusSelect').value = app.status || 'Applied';
+            document.getElementById('editFollowUpDate').value = app.followUpDate || '';
+            document.getElementById('editNotes').value = app.notes || '';
+
+            document.getElementById('editApplicationModal').style.display = 'flex';
+        }
+
+        function closeEditModal() {
+            document.getElementById('editApplicationModal').style.display = 'none';
+        }
+
+        function saveApplicationUpdate() {
+            const id = document.getElementById('editAppId').value;
+            const status = document.getElementById('editStatusSelect').value;
+            const followUpDate = document.getElementById('editFollowUpDate').value;
+            const notes = document.getElementById('editNotes').value;
+
+            const params = new URLSearchParams();
+            params.append('action', 'update_status');
+            params.append('id', id);
+            params.append('status', status);
+            params.append('follow_up_date', followUpDate);
+            params.append('notes', notes);
+
+            fetch('api/applications', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: params.toString()
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    closeEditModal();
+                    showTrackerAlert('Application status updated successfully!', 'success');
+                    loadApplications();
+                } else {
+                    alert('Error: ' + (data.error || 'Failed to update'));
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                alert('Network error while updating status.');
+            });
+        }
+
+        function deleteApplication(id, companyName) {
+            if (!confirm(`Are you sure you want to delete your application record for ${companyName}?`)) {
+                return;
+            }
+
+            const params = new URLSearchParams();
+            params.append('action', 'delete');
+            params.append('id', id);
+
+            fetch('api/applications', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: params.toString()
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    showTrackerAlert(`Application for ${companyName} removed.`, 'success');
+                    loadApplications();
+                } else {
+                    alert('Error: ' + (data.error || 'Failed to delete'));
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                alert('Network error while deleting application.');
+            });
+        }
+
+        function showTrackerAlert(msg, type) {
+            const el = document.getElementById('trackerAlert');
+            if (!el) return;
+            el.textContent = msg;
+            el.className = 'alert-banner ' + type;
+            el.style.display = 'block';
+            setTimeout(() => { el.style.display = 'none'; }, 4000);
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        }
+
+        function escapeJs(str) {
+            if (!str) return '';
+            return String(str).replace(/'/g, "\\'");
+        }
+    </script>
+</body>
+</html>

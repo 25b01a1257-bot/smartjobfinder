@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile Completeness Checker - Smart Job Finder</title>
+    <link rel="stylesheet" href="css/style.css?v=20260922_v1">
+    <style>
+        .profile-layout {
+            display: grid;
+            grid-template-columns: 340px 1fr;
+            gap: 28px;
+            align-items: flex-start;
+        }
+        @media (max-width: 860px) {
+            .profile-layout { grid-template-columns: 1fr; }
+        }
+        .score-card {
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 28px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+            text-align: center;
+        }
+        .circular-meter-wrap {
+            position: relative;
+            width: 140px;
+            height: 140px;
+            margin: 0 auto 16px auto;
+        }
+        .circular-meter-svg {
+            transform: rotate(-90deg);
+        }
+        .meter-bg {
+            fill: none;
+            stroke: #e2e8f0;
+            stroke-width: 10;
+        }
+        .meter-fill {
+            fill: none;
+            stroke: var(--primary);
+            stroke-width: 10;
+            stroke-linecap: round;
+            transition: stroke-dashoffset 0.8s ease, stroke 0.4s ease;
+        }
+        .meter-text-center {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 30px;
+            font-weight: 800;
+            color: var(--text-main);
+        }
+        .completeness-badge {
+            display: inline-block;
+            padding: 4px 14px;
+            border-radius: 9999px;
+            font-size: 13px;
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+        .badge-excellent { background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; }
+        .badge-good { background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; }
+        .badge-average { background: #fffbeb; color: #b45309; border: 1px solid #fde68a; }
+        .badge-incomplete { background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; }
+
+        .dimensions-list {
+            text-align: left;
+            margin-top: 20px;
+            border-top: 1px solid var(--border-color);
+            padding-top: 16px;
+        }
+        .dimension-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 0;
+            font-size: 13px;
+            border-bottom: 1px solid #f8fafc;
+        }
+        .dim-status-icon {
+            font-size: 14px;
+            font-weight: 700;
+        }
+        .dim-ok { color: #10b981; }
+        .dim-missing { color: #ef4444; }
+
+        .suggestions-box {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 16px;
+            margin-top: 20px;
+            text-align: left;
+        }
+        .suggestions-box h4 {
+            margin: 0 0 10px 0;
+            font-size: 14px;
+            font-weight: 700;
+            color: #1e293b;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .suggestions-box ul {
+            margin: 0;
+            padding-left: 18px;
+            font-size: 13px;
+            color: #475569;
+            line-height: 1.6;
+        }
+
+        .profile-form-card {
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 32px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+        }
+    </style>
+</head>
+<body>
+
+    <header class="app-header">
+        <div class="header-content">
+            <a href="index.html" class="logo-title">
+                <span class="logo-icon">⚡</span>
+                <h1>Smart Job Finder</h1>
+            </a>
+            <div class="header-nav-links">
+                <a href="job-search.html" class="nav-link">🔍 Job Search</a>
+                <a href="application-tracker.html" class="nav-link">📊 Application Tracker</a>
+                <a href="profile.html" class="nav-link active">👤 My Profile</a>
+                <a href="career-assistant.html" class="nav-link">🤖 AI Assistant</a>
+                <a href="interview-prep.html" class="nav-link">🎯 Interview Prep</a>
+            </div>
+            <div class="header-actions">
+                <span id="userGreeting" class="user-greeting-pill" style="display:none;">👋 Hello</span>
+                <a href="logout" class="btn btn-outline btn-sm">Sign Out</a>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-container" style="max-width: 1100px; margin-top: 24px;">
+        <div class="page-title-banner" style="margin-bottom: 24px;">
+            <div style="display: inline-flex; align-items: center; gap: 6px; background: #ede9fe; color: #6d28d9; padding: 4px 12px; border-radius: 9999px; font-size: 12px; font-weight: 700; margin-bottom: 8px;">
+                🎯 AI Profile Completeness Checker
+            </div>
+            <h2 style="font-size: 28px; font-weight: 800; color: var(--text-main); margin: 0 0 6px 0;">Student Profile &amp; Match Preferences</h2>
+            <p style="font-size: 14px; color: var(--text-muted); margin: 0;">Complete your profile details to unlock 100% accurate qualification eligibility and skill gap matching across 110+ tech employers.</p>
+        </div>
+
+        <div id="profileAlert" class="alert-banner" style="display: none;"></div>
+
+        <div class="profile-layout">
+            <!-- Left: Completeness Meter & Checklist -->
+            <aside class="score-card">
+                <div class="circular-meter-wrap">
+                    <svg class="circular-meter-svg" width="140" height="140" viewBox="0 0 140 140">
+                        <circle class="meter-bg" cx="70" cy="70" r="58"></circle>
+                        <circle id="meterFillCircle" class="meter-fill" cx="70" cy="70" r="58" stroke-dasharray="364.4" stroke-dashoffset="364.4"></circle>
+                    </svg>
+                    <div id="scoreNumber" class="meter-text-center">0%</div>
+                </div>
+
+                <div id="completenessBadge" class="completeness-badge badge-incomplete">Incomplete Profile</div>
+                <p id="completenessSummary" style="font-size: 13px; color: var(--text-muted); margin: 0 0 16px 0;">Evaluating profile completeness across 10 key dimensions...</p>
+
+                <!-- 10 Evaluated Dimensions -->
+                <div class="dimensions-list" id="dimensionsList">
+                    <div class="dimension-item"><span>Full Name</span><span class="dim-status-icon dim-missing" id="dim_name">✕</span></div>
+                    <div class="dimension-item"><span>Email Address</span><span class="dim-status-icon dim-missing" id="dim_email">✕</span></div>
+                    <div class="dimension-item"><span>Degree / Qualification</span><span class="dim-status-icon dim-missing" id="dim_degree">✕</span></div>
+                    <div class="dimension-item"><span>Branch / Major</span><span class="dim-status-icon dim-missing" id="dim_branch">✕</span></div>
+                    <div class="dimension-item"><span>Graduation Year</span><span class="dim-status-icon dim-missing" id="dim_graduationYear">✕</span></div>
+                    <div class="dimension-item"><span>Technical Skills</span><span class="dim-status-icon dim-missing" id="dim_skills">✕</span></div>
+                    <div class="dimension-item"><span>Preferred Role</span><span class="dim-status-icon dim-missing" id="dim_preferredRole">✕</span></div>
+                    <div class="dimension-item"><span>Experience Bracket</span><span class="dim-status-icon dim-missing" id="dim_experience">✕</span></div>
+                    <div class="dimension-item"><span>Expected Salary</span><span class="dim-status-icon dim-missing" id="dim_expectedSalary">✕</span></div>
+                    <div class="dimension-item"><span>Resume / Bio</span><span class="dim-status-icon dim-missing" id="dim_bio">✕</span></div>
+                </div>
+
+                <div class="suggestions-box">
+                    <h4>💡 Match Optimization Tips</h4>
+                    <ul id="suggestionsUl">
+                        <li>Enter your Degree and Branch to get filtered eligibility for campus &amp; tech roles.</li>
+                        <li>Add at least 3 core technical skills to see matching opportunities.</li>
+                    </ul>
+                </div>
+            </aside>
+
+            <!-- Right: Interactive Profile Form -->
+            <section class="profile-form-card">
+                <h3 style="font-size: 20px; font-weight: 700; color: var(--text-main); margin: 0 0 18px 0; border-bottom: 1px solid var(--border-color); padding-bottom: 12px;">
+                    📝 Edit Profile Information
+                </h3>
+
+                <form id="profileForm" onsubmit="saveProfile(event)">
+                    <div class="form-grid-2">
+                        <div class="form-group">
+                            <label for="inputName">Full Name *</label>
+                            <input type="text" id="inputName" name="name" class="form-control" required placeholder="e.g. Lahari">
+                        </div>
+                        <div class="form-group">
+                            <label for="inputEmail">Email Address (Read-only)</label>
+                            <input type="email" id="inputEmail" name="email" class="form-control" readonly style="background:#f1f5f9; color:#64748b;">
+                        </div>
+                    </div>
+
+                    <div class="form-grid-2">
+                        <div class="form-group">
+                            <label for="inputDegree">Academic Degree *</label>
+                            <select id="inputDegree" name="degree" class="form-control" required>
+                                <option value="">-- Select Degree --</option>
+                                <option value="B.Tech / B.E.">B.Tech / B.E.</option>
+                                <option value="M.Tech">M.Tech</option>
+                                <option value="MCA">MCA</option>
+                                <option value="BCA">BCA</option>
+                                <option value="B.Sc Computer Science">B.Sc Computer Science</option>
+                                <option value="M.Sc Computer Science / IT">M.Sc Computer Science / IT</option>
+                                <option value="Diploma in Engineering">Diploma in Engineering</option>
+                                <option value="MBA / BBA">MBA / BBA</option>
+                                <option value="Other">Other Graduate Degree</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="inputBranch">Branch / Specialization *</label>
+                            <select id="inputBranch" name="branch" class="form-control" required>
+                                <option value="">-- Select Branch --</option>
+                                <option value="Computer Science">Computer Science &amp; Engineering (CSE)</option>
+                                <option value="Information Technology">Information Technology (IT)</option>
+                                <option value="Electronics & Communication">Electronics &amp; Communication (ECE)</option>
+                                <option value="Electrical Engineering">Electrical Engineering (EEE)</option>
+                                <option value="Data Science & AI">Data Science &amp; Artificial Intelligence</option>
+                                <option value="Mechanical Engineering">Mechanical Engineering</option>
+                                <option value="Civil Engineering">Civil Engineering</option>
+                                <option value="Other">Other Branch</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-grid-2">
+                        <div class="form-group">
+                            <label for="inputGradYear">Graduation Year</label>
+                            <input type="number" id="inputGradYear" name="graduation_year" class="form-control" min="2018" max="2030" placeholder="e.g. 2026">
+                        </div>
+                        <div class="form-group">
+                            <label for="inputExp">Experience Level (Years)</label>
+                            <select id="inputExp" name="experience" class="form-control">
+                                <option value="0">Fresher / Student (0 years)</option>
+                                <option value="1">1 Year</option>
+                                <option value="2">2 Years</option>
+                                <option value="3">3 Years</option>
+                                <option value="4+">4+ Years</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="inputSkills">Technical Skills (Comma-separated) *</label>
+                        <input type="text" id="inputSkills" name="skills" class="form-control" placeholder="e.g. Java, Python, SQL, Spring Boot, React, Docker, AWS" required>
+                        <div class="form-hint">These skills are automatically matched with company requirements in Job Search.</div>
+                    </div>
+
+                    <div class="form-grid-2">
+                        <div class="form-group">
+                            <label for="inputRole">Preferred Job Role</label>
+                            <input type="text" id="inputRole" name="preferred_role" class="form-control" placeholder="e.g. Software Engineer, Full Stack Developer, Data Analyst">
+                        </div>
+                        <div class="form-group">
+                            <label for="inputSalary">Expected Annual Salary (₹)</label>
+                            <input type="number" id="inputSalary" name="expected_salary" class="form-control" min="100000" step="50000" placeholder="e.g. 900000">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="inputBio">Professional Bio &amp; Career Objective</label>
+                        <textarea id="inputBio" name="bio" class="form-control" rows="3" placeholder="Brief summary of your academic background, core strengths, projects, and target industry domains..."></textarea>
+                    </div>
+
+                    <div style="display: flex; gap: 14px; margin-top: 24px;">
+                        <button type="submit" class="btn btn-primary btn-lg" style="flex: 2;">
+                            💾 Save Profile &amp; Recompute Score
+                        </button>
+                        <a href="job-search.html" class="btn btn-secondary btn-lg" style="flex: 1; text-align: center;">
+                            🔍 View Matching Jobs
+                        </a>
+                    </div>
+                </form>
+            </section>
+        </div>
+    </main>
+
+    <script src="js/script.js?v=20260922_v1"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            loadProfile();
+        });
+
+        function loadProfile() {
+            fetch('api/profile', {
+                method: 'GET',
+                headers: { 'Accept': 'application/json' }
+            })
+            .then(res => {
+                if (res.status === 401) {
+                    window.location.href = 'login.html?error=' + encodeURIComponent('Please log in to view and edit your profile.');
+                    return null;
+                }
+                return res.json();
+            })
+            .then(data => {
+                if (!data || !data.success) return;
+
+                const user = data.user || {};
+                const score = data.completenessScore || 0;
+
+                // Update Greeting
+                const greet = document.getElementById('userGreeting');
+                if (greet && user.name) {
+                    greet.textContent = '👋 ' + user.name;
+                    greet.style.display = 'inline-block';
+                }
+
+                // Populate form
+                document.getElementById('inputName').value = user.name || '';
+                document.getElementById('inputEmail').value = user.email || '';
+                document.getElementById('inputDegree').value = user.degree || '';
+                document.getElementById('inputBranch').value = user.branch || '';
+                document.getElementById('inputGradYear').value = user.graduationYear || '';
+                document.getElementById('inputExp').value = user.experience || '0';
+                document.getElementById('inputSkills').value = user.skills || '';
+                document.getElementById('inputRole').value = user.preferredRole || '';
+                document.getElementById('inputSalary').value = user.expectedSalary || '';
+                document.getElementById('inputBio').value = user.bio || '';
+
+                // Render Score & Meter
+                renderMeter(score, data.dimensionStatus || {});
+                renderSuggestions(data.missingFields || [], data.suggestions || []);
+            })
+            .catch(err => {
+                console.error('Error fetching profile:', err);
+            });
+        }
+
+        function renderMeter(score, dimStatus) {
+            document.getElementById('scoreNumber').textContent = score + '%';
+            const circle = document.getElementById('meterFillCircle');
+            const circumference = 2 * Math.PI * 58; // approx 364.4
+            const offset = circumference - (score / 100) * circumference;
+            circle.style.strokeDashoffset = offset;
+
+            const badge = document.getElementById('completenessBadge');
+            const summary = document.getElementById('completenessSummary');
+
+            if (score >= 90) {
+                circle.style.stroke = '#10b981';
+                badge.className = 'completeness-badge badge-excellent';
+                badge.textContent = '🌟 All-Star Profile';
+                summary.textContent = 'Outstanding! Your profile is complete and primed for top-tier job matching.';
+            } else if (score >= 70) {
+                circle.style.stroke = '#2563eb';
+                badge.className = 'completeness-badge badge-good';
+                badge.textContent = '👍 Strong Profile';
+                summary.textContent = 'Good job! A few more details will unlock perfect eligibility calculations.';
+            } else if (score >= 50) {
+                circle.style.stroke = '#f59e0b';
+                badge.className = 'completeness-badge badge-average';
+                badge.textContent = '⚡ In Progress';
+                summary.textContent = 'Complete your missing academic & skill fields to improve matches.';
+            } else {
+                circle.style.stroke = '#ef4444';
+                badge.className = 'completeness-badge badge-incomplete';
+                badge.textContent = '⚠️ Needs Attention';
+                summary.textContent = 'Your profile is missing critical degree, branch, and technical skill data.';
+            }
+
+            // Update Dimensions list
+            for (const [key, ok] of Object.entries(dimStatus)) {
+                const el = document.getElementById('dim_' + key);
+                if (el) {
+                    if (ok) {
+                        el.className = 'dim-status-icon dim-ok';
+                        el.textContent = '✓';
+                    } else {
+                        el.className = 'dim-status-icon dim-missing';
+                        el.textContent = '✕';
+                    }
+                }
+            }
+        }
+
+        function renderSuggestions(missing, suggestions) {
+            const ul = document.getElementById('suggestionsUl');
+            if (!ul) return;
+            ul.innerHTML = '';
+
+            if (suggestions.length === 0) {
+                ul.innerHTML = '<li>🎉 All critical dimensions completed! Your profile is operating at peak matching performance.</li>';
+                return;
+            }
+
+            suggestions.forEach(s => {
+                const li = document.createElement('li');
+                li.textContent = s;
+                ul.appendChild(li);
+            });
+        }
+
+        function saveProfile(event) {
+            event.preventDefault();
+            const form = document.getElementById('profileForm');
+            const formData = new FormData(form);
+            const params = new URLSearchParams(formData);
+
+            fetch('api/profile', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: params.toString()
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    showProfileAlert('Profile updated successfully! Completeness score recomputed.', 'success');
+                    loadProfile();
+                } else {
+                    showProfileAlert('Error: ' + (data.error || 'Failed to update profile'), 'error');
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                showProfileAlert('Network error while saving profile.', 'error');
+            });
+        }
+
+        function showProfileAlert(msg, type) {
+            const el = document.getElementById('profileAlert');
+            if (!el) return;
+            el.textContent = msg;
+            el.className = 'alert-banner ' + type;
+            el.style.display = 'block';
+            setTimeout(() => { el.style.display = 'none'; }, 4000);
+        }
+    </script>
+</body>
+</html>

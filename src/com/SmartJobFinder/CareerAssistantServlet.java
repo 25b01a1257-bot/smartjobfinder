@@ -121,6 +121,65 @@ public class CareerAssistantServlet extends HttpServlet {
     private static String generateHeuristicGuidance(String message, String category, String name, String degree, String branch, String skills, String role, String companyDetails) {
         String msgLower = message.toLowerCase();
 
+        // FEATURE 10: AI Career Agent - 4 Core Placement Questions
+        if (msgLower.contains("which skill") || msgLower.contains("skill should i learn") || msgLower.contains("what skill")) {
+            return "### 💡 Highest-ROI Skills to Master for " + name + "\n\n"
+                    + "Based on placement statistics across 110+ tech employers, here is your prioritized skill roadmap:\n\n"
+                    + "**⭐⭐⭐⭐⭐ High Priority Core Stack:**\n"
+                    + "- **Java:** OOP Principles, Collections Framework (`HashMap`, `ArrayList`), Streams API, Multithreading.\n"
+                    + "- **Spring Boot:** RESTful APIs, Spring Data JPA, Spring Security, Microservices Architecture.\n"
+                    + "- **SQL & Databases:** Complex Joins, Window Functions, Indexing, Transaction Isolation (ACID).\n"
+                    + "- **Data Structures & Algorithms (DSA):** Arrays, HashMaps, Binary Trees, Two Pointers, Dynamic Programming.\n\n"
+                    + "**⭐⭐⭐⭐ Cloud & Engineering Tools:**\n"
+                    + "- **Docker & Git:** Containerizing microservices, Git branching workflows.\n"
+                    + "- **AWS / Cloud:** S3, EC2 basics, Serverless lambdas.\n\n"
+                    + "💡 **Pro-Tip:** Check the *'Learning Priority'* badge on each job card to see which subtopics match your dream companies!";
+        }
+
+        if (msgLower.contains("which company") || msgLower.contains("suits me") || msgLower.contains("company suits")) {
+            return "### 🏢 Target Employer Categorization for " + name + "\n\n"
+                    + "**Your Profile:** " + degree + " (" + branch + ") with skills: `" + skills + "`\n\n"
+                    + "Here are the top employer categories suited to your profile:\n\n"
+                    + "1. **Global IT Services & Consulting (TCS, Infosys, Accenture, Cognizant, Wipro):**\n"
+                    + "   - **Best Fit If:** You want extensive structured training, high placement probability, and accept all engineering branches.\n"
+                    + "   - **Focus:** Aptitude, Core Java/Python, SQL, Communication.\n\n"
+                    + "2. **Product Engineering & Big Tech (Amazon, Google, Microsoft):**\n"
+                    + "   - **Best Fit If:** You have strong DSA problem-solving skills and CS fundamentals.\n"
+                    + "   - **Focus:** System Design, Low-Level Design (LLD), Amazon Leadership Principles.\n\n"
+                    + "3. **FinTech & Enterprise Software (JPMorgan, PayPal, Oracle, SAP):**\n"
+                    + "   - **Best Fit If:** You excel in backend stability, Spring Boot microservices, and database performance.\n\n"
+                    + "👉 Visit **Job Search** to review your exact AI Compatibility Score calculated across 110+ companies!";
+        }
+
+        if (msgLower.contains("what salary") || msgLower.contains("salary can i expect") || msgLower.contains("expected salary") || msgLower.contains("lpa")) {
+            return "### 💰 Realistic Industry Salary Benchmarks (LPA)\n\n"
+                    + "In the current hiring market, campus & lateral compensation is structured in standardized LPA tiers:\n\n"
+                    + "- **Standard IT Services Entry Tier (0-1 yrs):** **3.6 LPA – 4.5 LPA**\n"
+                    + "  *(e.g., TCS Ninja, Infosys SE, Accenture ASE, Wipro Project Engineer)*\n\n"
+                    + "- **Differential / Digital Tier (0-2 yrs):** **6.0 LPA – 9.0 LPA**\n"
+                    + "  *(e.g., TCS Digital, Infosys Specialist Programmer, Cognizant GenC Next)*\n\n"
+                    + "- **Product & High-Tech Tier (0-3 yrs):** **12.0 LPA – 20+ LPA**\n"
+                    + "  *(e.g., Amazon SDE-1, Microsoft SWE, Google Software Engineer)*\n\n"
+                    + "- **Experienced Lateral (2-4 yrs):** **8.0 LPA – 16.0 LPA**\n\n"
+                    + "💡 **Smart Job Finder Setting:** You can select *'As per company norms'* or targeted brackets like *'4.5 LPA'* or *'8 LPA'* on your profile to filter verified openings matching your goals!";
+        }
+
+        if (msgLower.contains("what interview") || msgLower.contains("questions should i practice") || msgLower.contains("interview questions") || category.equalsIgnoreCase("interview")) {
+            return "### 🎯 50 Most Important Interview Questions Strategy\n\n"
+                    + "To clear competitive campus and off-campus rounds, practice across 4 essential pillars:\n\n"
+                    + "1. **Technical Core (15 Questions):**\n"
+                    + "   - Java: HashMap internal hashing, difference between abstract class and interface, Stream filter/map.\n"
+                    + "   - SQL: `INNER JOIN` vs `LEFT JOIN`, finding Nth highest salary, `GROUP BY` with `HAVING`.\n"
+                    + "   - Spring Boot: `@SpringBootApplication` breakdown, dependency injection with `@Autowired`.\n\n"
+                    + "2. **Role Specific & System Design (15 Questions):**\n"
+                    + "   - REST API design, HTTP status codes (200 vs 201 vs 404), Database normalization.\n\n"
+                    + "3. **Behavioral (10 Questions):**\n"
+                    + "   - Conflict handling, project deadline pressure, failure & recovery using the **STAR Method**.\n\n"
+                    + "4. **HR & Fitment (10 Questions):**\n"
+                    + "   - *'Tell me about yourself'*, career aspirations in 5 years, why this company.\n\n"
+                    + "🚀 **Launch Interview Prep:** Click **'🎯 Interview Prep'** in the navigation bar to practice answering with speech recognition and get instant AI evaluations & scores!";
+        }
+
         if (category.equalsIgnoreCase("eligibility") || msgLower.contains("eligible") || msgLower.contains("branch") || msgLower.contains("degree")) {
             return "### 🏛️ Eligibility Verification Guidance for " + name + "\n\n"
                     + "**Your Profile:** " + degree + " in " + branch + "\n\n"

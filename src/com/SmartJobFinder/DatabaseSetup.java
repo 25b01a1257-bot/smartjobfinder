@@ -92,6 +92,25 @@ public class DatabaseSetup {
                     + ")";
             stmt.executeUpdate(createAppTable);
 
+            // Create interview_questions table (Feature 5)
+            String createQuestionsTable = "CREATE TABLE IF NOT EXISTS interview_questions ("
+                    + "id INT AUTO_INCREMENT PRIMARY KEY, "
+                    + "company_name VARCHAR(150) NOT NULL, "
+                    + "role VARCHAR(150) NOT NULL, "
+                    + "category VARCHAR(50) NOT NULL, "
+                    + "question TEXT NOT NULL, "
+                    + "answer TEXT NOT NULL, "
+                    + "difficulty VARCHAR(50) DEFAULT 'Intermediate', "
+                    + "skills VARCHAR(255) DEFAULT '', "
+                    + "created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, "
+                    + "INDEX idx_comp_role (company_name, role), "
+                    + "INDEX idx_cat (category)"
+                    + ")";
+            stmt.executeUpdate(createQuestionsTable);
+
+            // Seed questions
+            InterviewQuestionSeedData.seedQuestionsIfEmpty(conn);
+
             // Ensure any NULL status is set to ACTIVE
             try {
                 stmt.executeUpdate("UPDATE companies SET status = 'ACTIVE' WHERE status IS NULL OR status = ''");
@@ -264,6 +283,26 @@ public class DatabaseSetup {
                     + ")";
             appStmt.executeUpdate(createAppTable);
             System.out.println("✅ Table 'job_applications' verified.");
+
+            // Create interview_questions table (Feature 5)
+            String createQuestionsTable = "CREATE TABLE IF NOT EXISTS interview_questions ("
+                    + "id INT AUTO_INCREMENT PRIMARY KEY, "
+                    + "company_name VARCHAR(150) NOT NULL, "
+                    + "role VARCHAR(150) NOT NULL, "
+                    + "category VARCHAR(50) NOT NULL, "
+                    + "question TEXT NOT NULL, "
+                    + "answer TEXT NOT NULL, "
+                    + "difficulty VARCHAR(50) DEFAULT 'Intermediate', "
+                    + "skills VARCHAR(255) DEFAULT '', "
+                    + "created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, "
+                    + "INDEX idx_comp_role (company_name, role), "
+                    + "INDEX idx_cat (category)"
+                    + ")";
+            appStmt.executeUpdate(createQuestionsTable);
+            System.out.println("✅ Table 'interview_questions' verified.");
+
+            // Seed questions
+            InterviewQuestionSeedData.seedQuestionsIfEmpty(conn);
 
             // Seed/Sync companies using CompanySeedData (110+ companies)
             CompanySeedData.seedOrUpdateCompanies(conn);

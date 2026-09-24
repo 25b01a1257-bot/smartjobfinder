@@ -3,24 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Interview Preparation & Mock Interview - Smart Job Finder</title>
-    <link rel="stylesheet" href="css/style.css?v=20260922_v1">
+    <title>AI Interview Preparation & 50 Most Important Questions - Smart Job Finder</title>
+    <link rel="stylesheet" href="css/style.css?v=20260924_v1">
     <style>
         .interview-prep-layout {
             display: grid;
-            grid-template-columns: 320px 1fr;
+            grid-template-columns: 340px 1fr;
             gap: 24px;
             align-items: flex-start;
         }
-        @media (max-width: 860px) {
+        @media (max-width: 900px) {
             .interview-prep-layout { grid-template-columns: 1fr; }
         }
         .prep-sidebar-card {
-            background: #ffffff;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(12px);
             border: 1px solid var(--border-color);
-            border-radius: 14px;
+            border-radius: 16px;
             padding: 24px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+            box-shadow: 0 4px 14px rgba(0,0,0,0.04);
+            position: sticky;
+            top: 80px;
         }
         .prep-tabs-bar {
             display: flex;
@@ -31,99 +34,169 @@
             overflow-x: auto;
         }
         .prep-tab-btn {
-            background: none;
-            border: none;
-            font-size: 14px;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            font-size: 13px;
             font-weight: 700;
             color: #64748b;
             padding: 8px 16px;
-            border-radius: 8px;
+            border-radius: 9999px;
             cursor: pointer;
             transition: all 0.2s;
             white-space: nowrap;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
         }
         .prep-tab-btn:hover {
             color: var(--primary);
             background: #f1f5f9;
+            border-color: #cbd5e1;
         }
         .prep-tab-btn.active {
             color: #ffffff;
             background: var(--primary);
+            border-color: var(--primary);
+            box-shadow: 0 2px 8px rgba(37, 99, 235, 0.25);
+        }
+        .company-quick-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 8px;
+            margin-bottom: 14px;
+        }
+        .comp-chip {
+            font-size: 11px;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 6px;
+            background: #f1f5f9;
+            color: #334155;
+            cursor: pointer;
+            border: 1px solid #e2e8f0;
+            transition: all 0.2s;
+        }
+        .comp-chip:hover, .comp-chip.active {
+            background: #eff6ff;
+            color: #1d4ed8;
+            border-color: #bfdbfe;
         }
         .question-card {
             background: #ffffff;
             border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 16px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+            border-radius: 14px;
+            padding: 22px;
+            margin-bottom: 18px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.02);
             transition: all 0.2s ease;
         }
         .question-card:hover {
             border-color: #cbd5e1;
-            box-shadow: 0 6px 14px rgba(0,0,0,0.05);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+            transform: translateY(-1px);
         }
         .q-header {
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
             gap: 12px;
-            margin-bottom: 10px;
+            margin-bottom: 12px;
         }
         .q-type-badge {
             font-size: 11px;
             font-weight: 700;
-            padding: 3px 8px;
+            padding: 3px 9px;
             border-radius: 6px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
-        .q-tech { background: #eff6ff; color: #1d4ed8; }
-        .q-hr { background: #ecfdf5; color: #047857; }
-        .q-role { background: #faf5ff; color: #7c3aed; }
+        .q-tech { background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; }
+        .q-role { background: #faf5ff; color: #7c3aed; border: 1px solid #e9d5ff; }
+        .q-hr { background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; }
+        .q-behavioral { background: #fffbeb; color: #b45309; border: 1px solid #fde68a; }
+        .q-difficulty {
+            font-size: 11px;
+            font-weight: 600;
+            padding: 3px 8px;
+            border-radius: 6px;
+            background: #f8fafc;
+            color: #64748b;
+        }
         .q-title {
             font-size: 16px;
             font-weight: 700;
             color: var(--text-main);
-            margin: 0;
-            line-height: 1.4;
+            margin: 6px 0 0 0;
+            line-height: 1.45;
         }
         .sample-answer-box {
             background: #f8fafc;
-            border-left: 3px solid var(--primary);
-            border-radius: 0 8px 8px 0;
-            padding: 12px 16px;
-            font-size: 13px;
+            border-left: 4px solid var(--primary);
+            border-radius: 0 10px 10px 0;
+            padding: 14px 18px;
+            font-size: 13.5px;
             color: #334155;
-            line-height: 1.6;
-            margin-top: 12px;
+            line-height: 1.65;
+            margin-top: 14px;
             display: none;
         }
         .mock-answer-section {
-            margin-top: 14px;
-            padding-top: 14px;
+            margin-top: 16px;
+            padding-top: 16px;
             border-top: 1px solid #f1f5f9;
+            display: none;
         }
         .mock-textarea {
             width: 100%;
             border: 1px solid #cbd5e1;
-            border-radius: 8px;
-            padding: 10px 12px;
-            font-size: 13px;
-            margin-bottom: 8px;
+            border-radius: 10px;
+            padding: 12px 14px;
+            font-size: 13.5px;
+            margin-bottom: 10px;
             outline: none;
             resize: vertical;
+            font-family: inherit;
+        }
+        .mock-textarea:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37,99,235,0.12);
         }
         .mock-feedback-box {
             background: #f0fdf4;
             border: 1px solid #bbf7d0;
-            border-radius: 8px;
-            padding: 14px;
-            margin-top: 10px;
+            border-radius: 10px;
+            padding: 16px;
+            margin-top: 12px;
             font-size: 13px;
             line-height: 1.6;
             color: #14532d;
             display: none;
+        }
+        .mic-btn {
+            background: #f8fafc;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            padding: 4px 10px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            color: #475569;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            transition: all 0.2s;
+        }
+        .mic-btn.recording {
+            background: #fee2e2;
+            color: #b91c1c;
+            border-color: #fca5a5;
+            animation: pulse-red 1.2s infinite;
+        }
+        @keyframes pulse-red {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.03); }
+            100% { transform: scale(1); }
         }
     </style>
 </head>
@@ -149,39 +222,58 @@
         </div>
     </header>
 
-    <main class="main-container" style="max-width: 1100px; margin-top: 24px;">
+    <main class="main-container" style="max-width: 1160px; margin-top: 24px;">
         <div class="page-title-banner" style="margin-bottom: 24px;">
             <div style="display: inline-flex; align-items: center; gap: 6px; background: #ecfdf5; color: #059669; padding: 4px 12px; border-radius: 9999px; font-size: 12px; font-weight: 700; margin-bottom: 8px;">
-                🎯 AI Interview Preparation &amp; Mock Evaluation
+                🔥 50 Most Important Interview Questions &amp; Practice Mode
             </div>
-            <h2 style="font-size: 28px; font-weight: 800; color: var(--text-main); margin: 0 0 6px 0;">Targeted Interview Questions &amp; Practice</h2>
-            <p style="font-size: 14px; color: var(--text-muted); margin: 0;">Prepare role-specific technical questions, HR behavioral scenarios, and test your answers with instant AI feedback.</p>
+            <h2 style="font-size: 28px; font-weight: 800; color: var(--text-main); margin: 0 0 6px 0;">
+                Targeted Company Interview Preparation
+            </h2>
+            <p style="font-size: 14px; color: var(--text-muted); margin: 0;">
+                Master technical DSA, system design, HR, and behavioral questions tailored specifically for <strong>Google, Amazon, Microsoft, TCS, Infosys, Accenture, Cognizant</strong> and top tech employers.
+            </p>
         </div>
 
         <div class="interview-prep-layout">
             <!-- Sidebar: Parameters -->
             <aside class="prep-sidebar-card">
-                <h3 style="font-size: 18px; font-weight: 700; margin: 0 0 16px 0; color: var(--text-main);">
-                    🏢 Target Opening
+                <h3 style="font-size: 17px; font-weight: 700; margin: 0 0 12px 0; color: var(--text-main);">
+                    🏢 Target Organization &amp; Role
                 </h3>
 
-                <div class="form-group" style="margin-bottom: 14px;">
-                    <label for="prepRole" style="display: block; font-size: 13px; font-weight: 700; margin-bottom: 4px;">Target Job Role *</label>
-                    <input type="text" id="prepRole" class="form-control" value="Software Engineer" placeholder="e.g. Software Engineer, Data Analyst">
+                <div class="form-group" style="margin-bottom: 10px;">
+                    <label style="display: block; font-size: 12px; font-weight: 700; margin-bottom: 4px; color: #475569;">
+                        Quick Company Select (Feature 4):
+                    </label>
+                    <div class="company-quick-chips">
+                        <span class="comp-chip active" onclick="selectCompany('Google', this)">Google</span>
+                        <span class="comp-chip" onclick="selectCompany('Amazon', this)">Amazon</span>
+                        <span class="comp-chip" onclick="selectCompany('Microsoft', this)">Microsoft</span>
+                        <span class="comp-chip" onclick="selectCompany('TCS', this)">TCS</span>
+                        <span class="comp-chip" onclick="selectCompany('Infosys', this)">Infosys</span>
+                        <span class="comp-chip" onclick="selectCompany('Accenture', this)">Accenture</span>
+                        <span class="comp-chip" onclick="selectCompany('Cognizant', this)">Cognizant</span>
+                    </div>
                 </div>
 
-                <div class="form-group" style="margin-bottom: 14px;">
-                    <label for="prepCompany" style="display: block; font-size: 13px; font-weight: 700; margin-bottom: 4px;">Target Company (Optional)</label>
-                    <input type="text" id="prepCompany" class="form-control" placeholder="e.g. Google, TCS, Infosys, Amazon">
+                <div class="form-group" style="margin-bottom: 12px;">
+                    <label for="prepCompany" style="display: block; font-size: 12px; font-weight: 700; margin-bottom: 4px;">Company Name</label>
+                    <input type="text" id="prepCompany" class="form-control" value="Google" placeholder="e.g. Google, Amazon, TCS">
                 </div>
 
-                <div class="form-group" style="margin-bottom: 14px;">
-                    <label for="prepSkills" style="display: block; font-size: 13px; font-weight: 700; margin-bottom: 4px;">Key Technical Skills</label>
-                    <input type="text" id="prepSkills" class="form-control" value="Java, SQL, Spring Boot, DSA" placeholder="e.g. Java, Python, SQL">
+                <div class="form-group" style="margin-bottom: 12px;">
+                    <label for="prepRole" style="display: block; font-size: 12px; font-weight: 700; margin-bottom: 4px;">Target Job Role *</label>
+                    <input type="text" id="prepRole" class="form-control" value="Software Engineer" placeholder="e.g. Software Engineer, Full Stack">
                 </div>
 
-                <div class="form-group" style="margin-bottom: 20px;">
-                    <label for="prepExp" style="display: block; font-size: 13px; font-weight: 700; margin-bottom: 4px;">Candidate Experience</label>
+                <div class="form-group" style="margin-bottom: 12px;">
+                    <label for="prepSkills" style="display: block; font-size: 12px; font-weight: 700; margin-bottom: 4px;">Key Technical Skills</label>
+                    <input type="text" id="prepSkills" class="form-control" value="Java, SQL, Spring Boot, DSA" placeholder="e.g. Java, SQL, Spring Boot">
+                </div>
+
+                <div class="form-group" style="margin-bottom: 18px;">
+                    <label for="prepExp" style="display: block; font-size: 12px; font-weight: 700; margin-bottom: 4px;">Experience Level</label>
                     <select id="prepExp" class="form-control">
                         <option value="0-1">Fresher / 0-1 yr</option>
                         <option value="1-3" selected>1-3 yrs</option>
@@ -189,18 +281,34 @@
                     </select>
                 </div>
 
-                <button type="button" class="btn btn-primary" style="width: 100%;" onclick="loadQuestions()">
-                    ⚡ Generate Questions
+                <button type="button" class="btn btn-primary" style="width: 100%; font-weight: 700;" onclick="loadQuestions()">
+                    ⚡ Generate 50 Questions Pack
                 </button>
+
+                <div style="margin-top: 16px; padding: 12px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 11.5px; color: #64748b;">
+                    💡 <strong>Pro Tip:</strong> Practice questions using the <strong>STAR</strong> methodology (Situation, Task, Action, Result) to score 9+/10 on our AI Mock evaluator.
+                </div>
             </aside>
 
             <!-- Main Content: Questions Tabs & Mock Interview -->
             <section>
-                <div class="prep-tabs-bar">
-                    <button class="prep-tab-btn active" data-category="ALL" onclick="filterCategory('ALL', this)">All Questions (15)</button>
-                    <button class="prep-tab-btn" data-category="technical" onclick="filterCategory('technical', this)">💻 Technical (5)</button>
-                    <button class="prep-tab-btn" data-category="hr" onclick="filterCategory('hr', this)">🤝 HR &amp; Behavioral (5)</button>
-                    <button class="prep-tab-btn" data-category="role" onclick="filterCategory('role', this)">💼 Role-Specific (5)</button>
+                <!-- 5 Required Tabs for Feature 3 -->
+                <div class="prep-tabs-bar" id="prepTabsBar">
+                    <button class="prep-tab-btn active" data-category="ALL" onclick="filterCategory('ALL', this)">
+                        All Questions (<span id="countAll">50</span>)
+                    </button>
+                    <button class="prep-tab-btn" data-category="Technical" onclick="filterCategory('Technical', this)">
+                        💻 Technical (<span id="countTech">15</span>)
+                    </button>
+                    <button class="prep-tab-btn" data-category="Role Specific" onclick="filterCategory('Role Specific', this)">
+                        💼 Role Specific (<span id="countRole">15</span>)
+                    </button>
+                    <button class="prep-tab-btn" data-category="HR" onclick="filterCategory('HR', this)">
+                        🤝 HR (<span id="countHr">10</span>)
+                    </button>
+                    <button class="prep-tab-btn" data-category="Behavioral" onclick="filterCategory('Behavioral', this)">
+                        🎯 Behavioral (<span id="countBeh">10</span>)
+                    </button>
                 </div>
 
                 <div id="questionsContainer">
@@ -210,30 +318,115 @@
         </div>
     </main>
 
-    <script src="js/script.js?v=20260922_v1"></script>
+    <script src="js/script.js?v=20260924_v1"></script>
     <script>
         let currentCategory = 'ALL';
         let questionData = [];
+        let recognition = null;
 
         document.addEventListener('DOMContentLoaded', () => {
-            // Check query params for role and company
             const urlParams = new URLSearchParams(window.location.search);
             const role = urlParams.get('role');
             const company = urlParams.get('company');
             if (role) document.getElementById('prepRole').value = role;
-            if (company) document.getElementById('prepCompany').value = company;
+            if (company) {
+                document.getElementById('prepCompany').value = company;
+                updateCompanyChips(company);
+            }
 
+            initSpeechRecognition();
             loadQuestions();
         });
 
+        function selectCompany(companyName, el) {
+            document.getElementById('prepCompany').value = companyName;
+            document.querySelectorAll('.comp-chip').forEach(c => c.classList.remove('active'));
+            if (el) el.classList.add('active');
+            loadQuestions();
+        }
+
+        function updateCompanyChips(companyName) {
+            document.querySelectorAll('.comp-chip').forEach(c => {
+                if (c.textContent.trim().toLowerCase() === companyName.trim().toLowerCase()) {
+                    c.classList.add('active');
+                } else {
+                    c.classList.remove('active');
+                }
+            });
+        }
+
+        function initSpeechRecognition() {
+            window.SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (window.SpeechRecognition) {
+                recognition = new window.SpeechRecognition();
+                recognition.continuous = false;
+                recognition.interimResults = false;
+                recognition.lang = 'en-US';
+            }
+        }
+
+        function toggleSpeech(idx) {
+            if (!recognition) {
+                alert('Speech recognition is not supported in this browser. You can type your answer directly into the textarea.');
+                return;
+            }
+
+            const btn = document.getElementById('micBtn_' + idx);
+            const textarea = document.getElementById('mockInput_' + idx);
+
+            if (btn.classList.contains('recording')) {
+                recognition.stop();
+                btn.classList.remove('recording');
+                btn.innerHTML = '🎤 Speak Answer';
+                return;
+            }
+
+            btn.classList.add('recording');
+            btn.innerHTML = '⏹️ Listening... (Speak Now)';
+
+            recognition.onresult = (event) => {
+                const transcript = event.results[0][0].transcript;
+                if (textarea.value) {
+                    textarea.value += ' ' + transcript;
+                } else {
+                    textarea.value = transcript;
+                }
+                btn.classList.remove('recording');
+                btn.innerHTML = '🎤 Speak Answer';
+            };
+
+            recognition.onerror = () => {
+                btn.classList.remove('recording');
+                btn.innerHTML = '🎤 Speak Answer';
+            };
+
+            recognition.onend = () => {
+                btn.classList.remove('recording');
+                btn.innerHTML = '🎤 Speak Answer';
+            };
+
+            try {
+                recognition.start();
+            } catch (e) {
+                btn.classList.remove('recording');
+                btn.innerHTML = '🎤 Speak Answer';
+            }
+        }
+
         function loadQuestions() {
             const role = document.getElementById('prepRole').value.trim() || 'Software Engineer';
-            const company = document.getElementById('prepCompany').value.trim();
+            const company = document.getElementById('prepCompany').value.trim() || 'Google';
             const skills = document.getElementById('prepSkills').value.trim();
             const exp = document.getElementById('prepExp').value;
 
             const container = document.getElementById('questionsContainer');
-            container.innerHTML = '<div style="text-align: center; padding: 40px; color: var(--text-muted);"><div class="results-loading-spinner" style="margin: 0 auto 12px auto;"></div><p>Curating role and skill-specific questions...</p></div>';
+            container.innerHTML = `
+                <div style="text-align: center; padding: 48px; background: #ffffff; border-radius: 14px; border: 1px solid #e2e8f0;">
+                    <div class="results-loading-spinner" style="margin: 0 auto 14px auto;"></div>
+                    <h4 style="margin:0 0 6px 0; color: #1e293b;">Generating 50 Most Important Questions for ${escapeHtml(company)}...</h4>
+                    <p style="font-size: 13px; color: #64748b; margin:0;">Synthesizing Technical (15), Role Specific (15), HR (10), and Behavioral (10) packs...</p>
+                </div>
+            `;
 
             const params = new URLSearchParams();
             params.append('role', role);
@@ -248,11 +441,20 @@
             .then(res => res.json())
             .then(data => {
                 questionData = data.questions || [];
+
+                if (data.counts) {
+                    document.getElementById('countAll').textContent = data.counts.all || questionData.length;
+                    document.getElementById('countTech').textContent = data.counts.technical || 15;
+                    document.getElementById('countRole').textContent = data.counts.roleSpecific || 15;
+                    document.getElementById('countHr').textContent = data.counts.hr || 10;
+                    document.getElementById('countBeh').textContent = data.counts.behavioral || 10;
+                }
+
                 renderQuestions();
             })
             .catch(err => {
                 console.error(err);
-                container.innerHTML = '<div class="alert-banner error" style="display:block;">Error fetching questions. Please try again.</div>';
+                container.innerHTML = '<div class="alert-banner error" style="display:block;">Error loading interview questions. Please try again.</div>';
             });
         }
 
@@ -278,37 +480,51 @@
 
             let html = '';
             filtered.forEach((q, idx) => {
-                const catLower = (q.category || 'tech').toLowerCase();
-                const badgeClass = catLower === 'technical' ? 'q-tech' : (catLower === 'hr' ? 'q-hr' : 'q-role');
+                const catLower = (q.category || 'technical').toLowerCase();
+                let badgeClass = 'q-tech';
+                if (catLower.includes('role')) badgeClass = 'q-role';
+                else if (catLower === 'hr') badgeClass = 'q-hr';
+                else if (catLower.includes('behavioral')) badgeClass = 'q-behavioral';
 
                 html += `
                     <div class="question-card" id="qCard_${idx}">
                         <div class="q-header">
                             <div>
-                                <span class="q-type-badge ${badgeClass}">${escapeHtml(q.category || 'Interview')}</span>
-                                <h4 class="q-title" style="margin-top: 6px;">${idx + 1}. ${escapeHtml(q.question)}</h4>
+                                <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+                                    <span class="q-type-badge ${badgeClass}">${escapeHtml(q.category || 'Technical')}</span>
+                                    <span class="q-difficulty">🎯 ${escapeHtml(q.difficulty || 'Intermediate')}</span>
+                                    <span style="font-size: 11px; color: #64748b; background: #f1f5f9; padding: 2px 8px; border-radius: 4px;">🏢 ${escapeHtml(q.company || 'Top Tech')}</span>
+                                </div>
+                                <h4 class="q-title">${idx + 1}. ${escapeHtml(q.question)}</h4>
                             </div>
                         </div>
 
-                        <div style="display: flex; gap: 8px; margin-top: 10px;">
+                        ${q.keyConcepts ? `<div style="font-size: 11.5px; color: #475569; margin-bottom: 10px;">🔑 <strong>Key Concepts:</strong> ${escapeHtml(q.keyConcepts)}</div>` : ''}
+
+                        <div style="display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap;">
                             <button type="button" class="btn btn-secondary btn-sm" onclick="toggleSampleAnswer(${idx})">
-                                💡 View Sample Answer
+                                💡 View STAR Sample Answer
                             </button>
                             <button type="button" class="btn btn-outline btn-sm" onclick="toggleMockMode(${idx})">
-                                🎙️ Practice Mock Answer
+                                🎤 Practice Answer
                             </button>
                         </div>
 
                         <div id="sampleAnswer_${idx}" class="sample-answer-box">
-                            <strong>⭐ Ideal Answer Framework:</strong>
+                            <strong>⭐ Model STAR Answer Framework:</strong>
                             <p style="margin: 6px 0 0 0;">${escapeHtml(q.sampleAnswer)}</p>
                         </div>
 
-                        <div id="mockSection_${idx}" class="mock-answer-section" style="display: none;">
-                            <label style="display: block; font-size: 12px; font-weight: 700; margin-bottom: 4px; color: #475569;">
-                                Type your answer here to receive instant AI evaluation &amp; scoring:
-                            </label>
-                            <textarea id="mockInput_${idx}" class="mock-textarea" rows="3" placeholder="Explain your approach, key technical concepts, or STAR method answer..."></textarea>
+                        <div id="mockSection_${idx}" class="mock-answer-section">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                                <label style="font-size: 12px; font-weight: 700; color: #475569;">
+                                    Type or speak your answer below to evaluate against industry benchmarks:
+                                </label>
+                                <button type="button" id="micBtn_${idx}" class="mic-btn" onclick="toggleSpeech(${idx})">
+                                    🎤 Speak Answer
+                                </button>
+                            </div>
+                            <textarea id="mockInput_${idx}" class="mock-textarea" rows="3" placeholder="Explain your approach, technical concepts, or describe your situation, task, action, and results..."></textarea>
                             <button type="button" class="btn btn-primary btn-sm" onclick="evaluateAnswer(${idx}, '${escapeJs(q.question)}', '${escapeJs(q.category)}')">
                                 🤖 Evaluate My Answer
                             </button>
@@ -341,12 +557,12 @@
             const answer = answerInput ? answerInput.value.trim() : '';
 
             if (!answer) {
-                alert('Please type an answer first before requesting evaluation.');
+                alert('Please type or speak an answer first before requesting evaluation.');
                 return;
             }
 
             feedbackBox.style.display = 'block';
-            feedbackBox.innerHTML = '<span style="color:#6366f1;">⏳ Evaluating your response against industry benchmarks...</span>';
+            feedbackBox.innerHTML = '<span style="color:#6366f1;">⏳ Evaluating answer technical correctness, confidence, structure, and missing points...</span>';
 
             const role = document.getElementById('prepRole').value.trim() || 'Software Engineer';
 
@@ -368,18 +584,25 @@
                     const ev = data.evaluation;
                     let strengthsHtml = (ev.strengths || []).map(s => `<li>✓ ${escapeHtml(s)}</li>`).join('');
                     let improveHtml = (ev.improvements || []).map(i => `<li>▲ ${escapeHtml(i)}</li>`).join('');
+                    const scoreNum = ev.score || 8;
+                    const scoreColor = scoreNum >= 8 ? '#166534' : (scoreNum >= 6 ? '#854d0e' : '#991b1b');
+                    const scoreBg = scoreNum >= 8 ? '#dcfce7' : (scoreNum >= 6 ? '#fef9c3' : '#fee2e2');
 
                     feedbackBox.innerHTML = `
-                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-                            <strong>🎯 Evaluation Score: ${ev.score || 8} / 10</strong>
-                            <span style="font-size:12px; background:#dcfce7; color:#166534; padding:2px 8px; border-radius:4px; font-weight:700;">AI Verified</span>
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; border-bottom: 1px solid #bbf7d0; padding-bottom: 8px;">
+                            <strong style="font-size: 15px; color: ${scoreColor};">
+                                🎯 Score: ${scoreNum} / 10
+                            </strong>
+                            <span style="font-size:12px; background:${scoreBg}; color:${scoreColor}; padding:3px 10px; border-radius:9999px; font-weight:700;">
+                                AI Verified
+                            </span>
                         </div>
-                        <p style="margin:0 0 8px 0;">${escapeHtml(ev.feedback || '')}</p>
-                        <div style="font-size:12px; margin-top:6px;">
-                            <strong>Strengths:</strong>
-                            <ul style="margin:2px 0 6px 0; padding-left:18px;">${strengthsHtml}</ul>
-                            <strong>Key Areas for Improvement:</strong>
-                            <ul style="margin:2px 0 0 0; padding-left:18px;">${improveHtml}</ul>
+                        <p style="margin:0 0 10px 0; font-weight:600; color:#14532d;">${escapeHtml(data.rating || '')}</p>
+                        <div style="font-size:12.5px;">
+                            <strong>Technical Correctness &amp; Strengths:</strong>
+                            <ul style="margin:4px 0 8px 0; padding-left:18px;">${strengthsHtml}</ul>
+                            <strong>Missing Points &amp; Suggestions:</strong>
+                            <ul style="margin:4px 0 0 0; padding-left:18px;">${improveHtml}</ul>
                         </div>
                     `;
                 } else {

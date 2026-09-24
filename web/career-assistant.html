@@ -200,6 +200,30 @@
     </header>
 
     <main class="main-container" style="max-width: 980px;">
+        <!-- FEATURE 12: Teacher Attraction Banner -->
+        <div class="teacher-attraction-banner" style="background: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #4338ca 100%); color: #ffffff; padding: 18px 24px; border-radius: 16px; margin-bottom: 20px; box-shadow: 0 10px 25px rgba(49, 46, 129, 0.25); border: 1px solid rgba(255,255,255,0.15);">
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:10px;">
+                <div style="display:flex; align-items:center; gap:12px;">
+                    <span style="font-size:26px;">🔥</span>
+                    <div>
+                        <h3 style="margin:0; font-size:18px; font-weight:800; letter-spacing:-0.3px; color:#ffffff;">AI Powered Career Platform</h3>
+                        <p style="margin:2px 0 0 0; font-size:12px; color:#c7d2fe;">Smart Job Finder: Autonomous AI Career Advisory &amp; Placement Decision Engine</p>
+                    </div>
+                </div>
+                <span style="background:rgba(255,255,255,0.15); border:1px solid rgba(255,255,255,0.25); padding:4px 14px; border-radius:9999px; font-size:12px; font-weight:700; color:#fbbf24;">
+                    ⭐ AI Career Agent
+                </span>
+            </div>
+            <div style="display:flex; flex-wrap:wrap; gap:8px;">
+                <span style="background:rgba(255,255,255,0.12); padding:4px 10px; border-radius:6px; font-size:11px; font-weight:600;">✅ Skill Matching</span>
+                <span style="background:rgba(255,255,255,0.12); padding:4px 10px; border-radius:6px; font-size:11px; font-weight:600;">✅ Skill Gap Analysis</span>
+                <span style="background:rgba(255,255,255,0.12); padding:4px 10px; border-radius:6px; font-size:11px; font-weight:600;">✅ Interview Preparation (50+ Qs)</span>
+                <span style="background:rgba(255,255,255,0.12); padding:4px 10px; border-radius:6px; font-size:11px; font-weight:600;">✅ Application Tracking (6-Step Timeline)</span>
+                <span style="background:rgba(255,255,255,0.12); padding:4px 10px; border-radius:6px; font-size:11px; font-weight:600;">✅ Career Agent</span>
+                <span style="background:rgba(255,255,255,0.12); padding:4px 10px; border-radius:6px; font-size:11px; font-weight:600;">✅ Company-Specific Questions</span>
+            </div>
+        </div>
+
         <div class="assistant-container">
             <div class="assistant-header-bar">
                 <div class="assistant-title-group">
@@ -232,19 +256,21 @@
                 </div>
             </div>
 
-            <!-- Quick Prompts Bar -->
+            <!-- FEATURE 10: Quick Prompts Bar (4 Core Questions + Advanced) -->
             <div class="quick-prompts-bar">
-                <span class="quick-prompt-chip" onclick="sendQuickPrompt('How do I check if my degree and branch make me eligible for software roles?')">🎓 Branch Eligibility Rules</span>
+                <span class="quick-prompt-chip" style="background:#eef2ff; color:#4338ca; border-color:#c7d2fe; font-weight:700;" onclick="sendQuickPrompt('Which skill should I learn?')">💡 Which skill should I learn?</span>
+                <span class="quick-prompt-chip" style="background:#eef2ff; color:#4338ca; border-color:#c7d2fe; font-weight:700;" onclick="sendQuickPrompt('Which company suits me?')">🏢 Which company suits me?</span>
+                <span class="quick-prompt-chip" style="background:#eef2ff; color:#4338ca; border-color:#c7d2fe; font-weight:700;" onclick="sendQuickPrompt('What salary can I expect?')">💰 What salary can I expect?</span>
+                <span class="quick-prompt-chip" style="background:#eef2ff; color:#4338ca; border-color:#c7d2fe; font-weight:700;" onclick="sendQuickPrompt('What interview questions should I practice?')">🎯 What interview questions should I practice?</span>
+                <span class="quick-prompt-chip" onclick="sendQuickPrompt('How do I check if my degree and branch make me eligible for software roles?')">🎓 Branch Eligibility</span>
                 <span class="quick-prompt-chip" onclick="sendQuickPrompt('Generate a 4-week learning roadmap for Spring Boot, Microservices and Docker')">🚀 4-Week Skill Roadmap</span>
                 <span class="quick-prompt-chip" onclick="sendQuickPrompt('What are top ATS resume keywords for a Java Backend Developer?')">📄 Resume ATS Keywords</span>
                 <span class="quick-prompt-chip" onclick="sendQuickPrompt('What is the complete checklist before I click Apply Now on an official portal?')">📋 Pre-Application Checklist</span>
-                <span class="quick-prompt-chip" onclick="sendQuickPrompt('How should a fresher prepare for technical coding interviews?')">🎯 Technical Interview Prep</span>
-                <span class="quick-prompt-chip" onclick="sendQuickPrompt('What are the best career paths for an Electronics & Communication (ECE) student in software?')">💡 ECE to Tech Career Advice</span>
             </div>
 
             <!-- Input Bar -->
             <div class="chat-input-bar">
-                <input type="text" id="userInput" placeholder="Ask about job eligibility, skill roadmaps, resume tips, or interview preparation..." onkeydown="handleKeyDown(event)">
+                <input type="text" id="userInput" placeholder="Ask about job eligibility, skill roadmaps, salary expectations, or interview questions..." onkeydown="handleKeyDown(event)">
                 <button type="button" class="chat-send-btn" onclick="sendMessage()">
                     Send ➔
                 </button>

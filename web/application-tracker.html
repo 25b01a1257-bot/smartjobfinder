@@ -248,6 +248,30 @@
     </header>
 
     <main class="main-container" style="max-width: 1040px; margin-top: 24px;">
+        <!-- FEATURE 12: Teacher Attraction Banner -->
+        <div class="teacher-attraction-banner" style="background: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #4338ca 100%); color: #ffffff; padding: 20px 24px; border-radius: 16px; margin-bottom: 24px; box-shadow: 0 10px 25px rgba(49, 46, 129, 0.25); border: 1px solid rgba(255,255,255,0.15);">
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:12px;">
+                <div style="display:flex; align-items:center; gap:12px;">
+                    <span style="font-size:28px;">🔥</span>
+                    <div>
+                        <h3 style="margin:0; font-size:20px; font-weight:800; letter-spacing:-0.3px; color:#ffffff;">AI Powered Career Platform</h3>
+                        <p style="margin:2px 0 0 0; font-size:13px; color:#c7d2fe;">Smart Job Finder: End-to-End Recruitment Lifecycle &amp; Application Progress Tracker</p>
+                    </div>
+                </div>
+                <span style="background:rgba(255,255,255,0.15); border:1px solid rgba(255,255,255,0.25); padding:4px 14px; border-radius:9999px; font-size:12px; font-weight:700; color:#fbbf24;">
+                    ⭐ Naukri + LinkedIn + InterviewBit + AI Agent
+                </span>
+            </div>
+            <div style="display:flex; flex-wrap:wrap; gap:8px;">
+                <span style="background:rgba(255,255,255,0.12); padding:4px 10px; border-radius:6px; font-size:12px; font-weight:600;">✅ Skill Matching</span>
+                <span style="background:rgba(255,255,255,0.12); padding:4px 10px; border-radius:6px; font-size:12px; font-weight:600;">✅ Skill Gap Analysis</span>
+                <span style="background:rgba(255,255,255,0.12); padding:4px 10px; border-radius:6px; font-size:12px; font-weight:600;">✅ Interview Preparation (50+ Qs)</span>
+                <span style="background:rgba(255,255,255,0.12); padding:4px 10px; border-radius:6px; font-size:12px; font-weight:600;">✅ Application Tracking (6-Step Timeline)</span>
+                <span style="background:rgba(255,255,255,0.12); padding:4px 10px; border-radius:6px; font-size:12px; font-weight:600;">✅ Career Agent</span>
+                <span style="background:rgba(255,255,255,0.12); padding:4px 10px; border-radius:6px; font-size:12px; font-weight:600;">✅ Company-Specific Questions</span>
+            </div>
+        </div>
+
         <div class="page-title-banner" style="margin-bottom: 24px;">
             <div style="display: inline-flex; align-items: center; gap: 6px; background: #e0f2fe; color: #0284c7; padding: 4px 12px; border-radius: 9999px; font-size: 12px; font-weight: 700; margin-bottom: 8px;">
                 📋 Student Application Management System
@@ -509,6 +533,9 @@
                             ${hasUrl ? `<div class="tracker-meta-item">🔗 Portal: <a href="${escapeHtml(app.officialUrl)}" target="_blank" rel="noopener noreferrer" style="color: #2563eb; font-weight: 600;">Official Careers Page ↗</a></div>` : ''}
                         </div>
 
+                        <!-- FEATURE 9: Naukri 6-Step Application Lifecycle Timeline -->
+                        ${renderNaukriTimeline(app.status)}
+
                         ${app.notes && app.notes.trim() ? `
                             <div class="tracker-notes-box">
                                 📝 <strong>Notes:</strong> ${escapeHtml(app.notes)}
@@ -541,6 +568,58 @@
             });
 
             container.innerHTML = html;
+        }
+
+        // FEATURE 9: 6-Step Application Lifecycle Timeline Renderer
+        function renderNaukriTimeline(status) {
+            const s = (status || '').toLowerCase().trim();
+            let activeStage = 2; // default Applied
+            if (s === 'saved') activeStage = 1;
+            else if (s === 'applied') activeStage = 2;
+            else if (s === 'resume sent') activeStage = 3;
+            else if (s === 'shortlisted') activeStage = 4;
+            else if (s === 'interview') activeStage = 5;
+            else if (s === 'offer') activeStage = 6;
+            else if (s === 'rejected' || s === 'withdrawn') activeStage = 2;
+
+            const steps = [
+                { num: '1️⃣', label: 'Viewed Job', step: 1 },
+                { num: '2️⃣', label: 'Applied', step: 2 },
+                { num: '3️⃣', label: 'Resume Sent', step: 3 },
+                { num: '4️⃣', label: 'Shortlisted', step: 4 },
+                { num: '5️⃣', label: 'Interview', step: 5 },
+                { num: '6️⃣', label: 'Offer', step: 6 }
+            ];
+
+            let itemsHtml = steps.map((st, idx) => {
+                let cls = 'naukri-step';
+                if (st.step < activeStage) cls += ' completed';
+                else if (st.step === activeStage) cls += ' active';
+
+                let lineHtml = (idx < steps.length - 1)
+                    ? `<div class="naukri-line ${st.step < activeStage ? 'completed' : ''}"></div>`
+                    : '';
+
+                return `
+                    <div class="${cls}">
+                        <div class="naukri-circle">${st.num}</div>
+                        <div class="naukri-label">${st.label}</div>
+                    </div>
+                    ${lineHtml}
+                `;
+            }).join('');
+
+            return `
+                <div class="naukri-timeline-wrap">
+                    <div class="naukri-timeline-header">
+                        <span class="naukri-timeline-title">📈 Application Hiring Lifecycle</span>
+                        <span class="naukri-stage-tag">Stage ${activeStage} of 6: ${steps[activeStage - 1].label}</span>
+                    </div>
+                    <div class="naukri-timeline-steps">
+                        ${itemsHtml}
+                    </div>
+                </div>
+            `;
         }
 
         function openEditModal(appId) {

@@ -270,8 +270,20 @@
                             <input type="text" id="inputRole" name="preferred_role" class="form-control" placeholder="e.g. Software Engineer, Full Stack Developer, Data Analyst">
                         </div>
                         <div class="form-group">
-                            <label for="inputSalary">Expected Annual Salary (₹)</label>
-                            <input type="number" id="inputSalary" name="expected_salary" class="form-control" min="100000" step="50000" placeholder="e.g. 900000">
+                            <label for="inputSalary">Expected Annual Salary (LPA)</label>
+                            <select id="inputSalary" name="expected_salary" class="form-control">
+                                <option value="As per company norms">As per company norms</option>
+                                <option value="3 LPA">3 LPA</option>
+                                <option value="3.6 LPA">3.6 LPA</option>
+                                <option value="4 LPA">4 LPA</option>
+                                <option value="4.5 LPA">4.5 LPA</option>
+                                <option value="5 LPA">5 LPA</option>
+                                <option value="6 LPA">6 LPA</option>
+                                <option value="8 LPA">8 LPA</option>
+                                <option value="10 LPA">10 LPA</option>
+                                <option value="12 LPA">12 LPA</option>
+                                <option value="15+ LPA">15+ LPA</option>
+                            </select>
                         </div>
                     </div>
 
@@ -333,7 +345,34 @@
                 document.getElementById('inputExp').value = user.experience || '0';
                 document.getElementById('inputSkills').value = user.skills || '';
                 document.getElementById('inputRole').value = user.preferredRole || '';
-                document.getElementById('inputSalary').value = user.expectedSalary || '';
+                
+                // Populate Expected Salary with LPA normalization (Feature 1)
+                let rawSal = user.expectedSalary || 'As per company norms';
+                if (rawSal === '800000') rawSal = '8 LPA';
+                else if (rawSal === '360000') rawSal = '3.6 LPA';
+                else if (rawSal === '450000') rawSal = '4.5 LPA';
+                else if (rawSal === '600000') rawSal = '6 LPA';
+                else if (rawSal === '1000000') rawSal = '10 LPA';
+                else if (rawSal === '1200000') rawSal = '12 LPA';
+                const salSelect = document.getElementById('inputSalary');
+                if (salSelect) {
+                    let matched = false;
+                    for (let opt of salSelect.options) {
+                        if (opt.value.toLowerCase() === rawSal.toLowerCase()) {
+                            opt.selected = true;
+                            matched = true;
+                            break;
+                        }
+                    }
+                    if (!matched) {
+                        let opt = document.createElement('option');
+                        opt.value = rawSal;
+                        opt.textContent = rawSal;
+                        opt.selected = true;
+                        salSelect.appendChild(opt);
+                    }
+                }
+
                 document.getElementById('inputBio').value = user.bio || '';
 
                 // Render Score & Meter

@@ -684,7 +684,7 @@ function renderDynamicJobCards(jobs, skillsSelected) {
         const tierClass = job.matchTierClass || 'match-medium';
         const tierLabel = job.matchCount > 0 ? `${job.matchCount} Skills Matched` : (job.matchTierLabel || 'Good Match');
         const applyUrl = job.applyUrl || '#';
-        const displaySal = job.displaySalary || job.salary || 'Competitive';
+        const displaySal = formatSalaryLpa(job.displaySalary || job.salary);
         const exp = job.experience || '0-2';
         const desc = job.description || '';
         const requiredDegree = job.requiredDegree || 'B.Tech / B.E., M.Tech, MCA';
@@ -723,20 +723,49 @@ function renderDynamicJobCards(jobs, skillsSelected) {
             `;
         }
 
-        // Learning Topics HTML (Phase 6 AI Skill Gap Analyzer)
+        // FEATURE 8: Learning Priority & Key Subtopics
         let learningTopicsHtml = '';
-        if (job.learningTopics && job.learningTopics.length > 0) {
-            learningTopicsHtml = `
-                <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px 12px; margin-top: 10px; font-size: 12px;">
-                    <strong style="color: #475569; display: block; margin-bottom: 6px;">📚 Curated Learning Topics &amp; Resources:</strong>
-                    <div style="display: flex; flex-wrap: wrap; gap: 6px;">
-                        ${job.learningTopics.map(t => `
+        const priorityStars = job.learningPriorityStars || '⭐⭐⭐⭐⭐ High Priority';
+        const subtopics = job.learningSubtopics || [];
+        const topics = job.learningTopics || [];
+
+        if (subtopics.length > 0 || topics.length > 0) {
+            let subtopicsListHtml = '';
+            if (subtopics.length > 0) {
+                subtopicsListHtml = `
+                    <div style="margin-top: 6px;">
+                        <div style="font-size: 11px; font-weight: 700; color: #475569; margin-bottom: 4px;">Key Subtopics to Master:</div>
+                        <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+                            ${subtopics.map(st => `<span class="learning-subtopic-tag">📌 ${escapeHtml(st)}</span>`).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+
+            let resourceLinksHtml = '';
+            if (topics.length > 0) {
+                resourceLinksHtml = `
+                    <div style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px;">
+                        ${topics.map(t => `
                             <a href="${escapeHtml(t.resource)}" target="_blank" rel="noopener noreferrer" style="text-decoration: none; display: inline-flex; align-items: center; gap: 4px; background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: 600;">
                                 <span>📖 ${escapeHtml(t.topic)}</span>
                                 <span style="font-size: 10px; opacity: 0.8;">(${escapeHtml(t.priority)})</span>
                             </a>
                         `).join('')}
                     </div>
+                `;
+            }
+
+            learningTopicsHtml = `
+                <div class="learning-priority-card">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <strong style="color: #1e293b; font-size: 12px; display: flex; align-items: center; gap: 4px;">
+                            <span>🎯</span> Learning Priority:
+                        </strong>
+                        <span class="learning-priority-stars">${escapeHtml(priorityStars)}</span>
+                    </div>
+                    ${subtopicsListHtml}
+                    ${resourceLinksHtml}
                 </div>
             `;
         }
@@ -781,7 +810,7 @@ function renderDynamicJobCards(jobs, skillsSelected) {
                 </div>
 
                 <div class="job-meta-badges">
-                    <span class="badge badge-salary">💰 ₹${escapeHtml(displaySal)} / yr</span>
+                    <span class="badge badge-salary badge-salary-lpa">💰 ${escapeHtml(displaySal)}</span>
                     <span class="badge badge-exp">💼 ${escapeHtml(exp)} yrs</span>
                     <span class="badge" style="background:#f1f5f9; color:#334155;">📍 ${escapeHtml(jobLoc)}</span>
                 </div>
@@ -822,9 +851,13 @@ function renderDynamicJobCards(jobs, skillsSelected) {
                     <a href="interview-prep.html?role=${encodeURIComponent(role)}&company=${encodeURIComponent(company)}" class="btn btn-secondary" style="font-size: 12px; padding: 8px 12px; text-decoration: none;">
                         🎯 Prep Interview
                     </a>
-                    <button type="button" class="btn btn-apply" onclick="openApplyWorkflowModalById(${job.id})">
+                    <a href="${escapeHtml(applyUrl && applyUrl !== '#' ? applyUrl : '#')}"
+                       target="_blank"
+                       rel="noopener noreferrer"
+                       class="btn btn-apply"
+                       onclick="handleDirectApply(event, ${job.id})">
                         Apply Now ➔
-                    </button>
+                    </a>
                 </div>
             </div>
         `;
@@ -835,8 +868,42 @@ function renderDynamicJobCards(jobs, skillsSelected) {
 }
 
 // ========================================================
-// Phase 3: Complete Apply Now Application Workflow Handlers
+// FEATURE 1: Professional Expected Salary Formatter
 // ========================================================
+function formatSalaryLpa(raw) {
+    if (!raw) return 'As per company norms';
+    const s = String(raw).trim();
+    if (/lpa/i.test(s) || /norms/i.test(s) || /competitive/i.test(s)) return s;
+    const num = parseFloat(s.replace(/[^0-9.]/g, ''));
+    if (isNaN(num) || num <= 0) return s;
+    if (num >= 100000) {
+        const lpa = num / 100000.0;
+        return (lpa % 1 === 0 ? lpa.toFixed(0) : lpa.toFixed(1)) + ' LPA';
+    }
+    if (num <= 50) {
+        return num + ' LPA';
+    }
+    return '₹' + num.toLocaleString('en-IN');
+}
+
+// ========================================================
+// FEATURE 2: Official Apply Link Handler & 6-Step Workflow
+// ========================================================
+function handleDirectApply(event, jobId) {
+    const job = (window.__currentJobsData || []).find(j => j.id === jobId);
+    if (!job) return;
+    const url = (job.applyUrl || '').trim();
+    if (!url || url === '#' || url === 'about:blank' || !url.startsWith('http')) {
+        if (event) event.preventDefault();
+        alert('Application link currently unavailable for ' + (job.companyName || 'this company') + '. Please try again shortly or check their corporate career portal.');
+        return;
+    }
+    // If link is valid: browser automatically navigates in new tab via target="_blank"
+    // Also trigger modal so the candidate can record the application with the 6-step timeline
+    setTimeout(() => {
+        openApplyWorkflowModal(job);
+    }, 250);
+}
 
 function openApplyWorkflowModalById(jobId) {
     const job = (window.__currentJobsData || []).find(j => j.id === jobId);
@@ -854,8 +921,8 @@ function openApplyWorkflowModal(job) {
     const company = job.companyName || 'Company';
     const role = job.role || 'Job Role';
     const logo = job.logo || 'images/default-company.svg';
-    const url = job.applyUrl || '#';
-    const salary = job.displaySalary || job.salary || 'Competitive';
+    const url = (job.applyUrl || '').trim();
+    const salary = formatSalaryLpa(job.displaySalary || job.salary);
     const exp = job.experience || '0-2';
     const degree = job.requiredDegree || 'B.Tech / B.E., M.Tech, MCA';
     const branches = job.eligibleBranches || 'All branches';
@@ -867,7 +934,7 @@ function openApplyWorkflowModal(job) {
     document.getElementById('workflowJobRole').textContent = role;
     document.getElementById('workflowCompanyLogo').src = logo;
     document.getElementById('workflowLocation').textContent = '📍 ' + location;
-    document.getElementById('workflowSalary').textContent = '💰 ₹' + salary;
+    document.getElementById('workflowSalary').textContent = '💰 ' + salary;
     document.getElementById('workflowExperience').textContent = '💼 ' + exp + ' yrs exp';
     document.getElementById('workflowRequiredDegree').textContent = degree;
     document.getElementById('workflowEligibleBranches').textContent = branches;
@@ -893,8 +960,26 @@ function openApplyWorkflowModal(job) {
     }
 
     const officialBtn = document.getElementById('workflowOfficialLinkBtn');
-    officialBtn.href = url && url !== '#' ? url : 'https://www.google.com/search?q=' + encodeURIComponent(company + ' careers ' + role);
-    officialBtn.textContent = '🌐 Proceed to Official ' + company + ' Portal ↗';
+    if (officialBtn) {
+        if (!url || url === '#' || !url.startsWith('http')) {
+            officialBtn.removeAttribute('href');
+            officialBtn.style.background = '#94a3b8';
+            officialBtn.style.borderColor = '#94a3b8';
+            officialBtn.textContent = '⚠️ Application Link Currently Unavailable';
+            officialBtn.onclick = function(e) {
+                e.preventDefault();
+                alert('Application link currently unavailable for ' + company + '.');
+            };
+        } else {
+            officialBtn.href = url;
+            officialBtn.target = '_blank';
+            officialBtn.rel = 'noopener noreferrer';
+            officialBtn.style.background = '';
+            officialBtn.style.borderColor = '';
+            officialBtn.textContent = '🌐 Proceed to Official ' + company + ' Portal ↗';
+            officialBtn.onclick = null;
+        }
+    }
 
     // Populate Tracker Form
     document.getElementById('trackerCompanyId').value = job.id;

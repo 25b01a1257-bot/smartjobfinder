@@ -36,12 +36,14 @@ public class JobMatchingService {
         public String missingQualification = "";
         public String missingBranch = "";
 
-        // Skill Matching & AI Skill Gap Fields (Phase 6)
+        // Skill Matching & AI Skill Gap Fields (Phase 6 & 8)
         public List<String> matchedSkills = new ArrayList<>();
         public List<String> missingSkills = new ArrayList<>();
         public List<String> recommendedTopics = new ArrayList<>();
         public List<String> learningResources = new ArrayList<>();
-        public String learningPriority = "Medium";
+        public List<String> learningSubtopics = new ArrayList<>();
+        public String learningPriority = "High Priority";
+        public String learningPriorityStars = "⭐⭐⭐⭐⭐ High Priority";
 
         public int matchCount = 0;
         public int matchScore = 0;
@@ -52,49 +54,88 @@ public class JobMatchingService {
     }
 
     /**
+     * Professional Salary Formatter (Feature 1):
+     * Formats raw numeric strings (e.g. 800000 -> 8 LPA, 360000 -> 3.6 LPA).
+     */
+    public static String formatSalaryLpa(String raw) {
+        if (raw == null || raw.trim().isEmpty()) return "As Per Company Norms";
+        String trimmed = raw.trim();
+        if (trimmed.toLowerCase().contains("lpa") || trimmed.toLowerCase().contains("norms") || trimmed.toLowerCase().contains("competitive")) {
+            return trimmed;
+        }
+        try {
+            String digitsOnly = trimmed.replaceAll("[^0-9]", "");
+            if (!digitsOnly.isEmpty()) {
+                double val = Double.parseDouble(digitsOnly);
+                if (val >= 100000) {
+                    double lpa = val / 100000.0;
+                    if (lpa == (long) lpa) {
+                        return String.format("%d LPA", (long) lpa);
+                    } else {
+                        return String.format("%.1f LPA", lpa);
+                    }
+                } else if (val > 0 && val <= 100) {
+                    return trimmed + " LPA";
+                }
+            }
+        } catch (Exception ignore) {}
+        return trimmed;
+    }
+
+    /**
      * Curated skill learning roadmap dictionary providing realistic topics & beginner-friendly resources.
      */
     private static final Map<String, SkillGuide> SKILL_RESOURCES = new HashMap<>();
 
     static class SkillGuide {
+        String skill;
         String topic;
         String resource;
         String priority;
+        String stars;
+        List<String> subtopics = new ArrayList<>();
 
-        SkillGuide(String topic, String resource, String priority) {
+        SkillGuide(String skill, String topic, String resource, String priority, String stars, String... subtopics) {
+            this.skill = skill;
             this.topic = topic;
             this.resource = resource;
             this.priority = priority;
+            this.stars = stars;
+            if (subtopics != null) {
+                for (String st : subtopics) {
+                    this.subtopics.add(st);
+                }
+            }
         }
     }
 
     static {
-        SKILL_RESOURCES.put("java", new SkillGuide("OOP Concepts, Collections Framework, Multithreading, Lambdas & Streams", "dev.java (Official Java Tutorials) & Mooc.fi", "High"));
-        SKILL_RESOURCES.put("python", new SkillGuide("Data Structures, OOP, List Comprehensions, File I/O, Generators", "docs.python.org & Automate the Boring Stuff with Python", "High"));
-        SKILL_RESOURCES.put("c++", new SkillGuide("Pointers, Memory Management, STL Containers, RAII, Modern C++17", "LearnCpp.com & CppReference", "High"));
-        SKILL_RESOURCES.put("c", new SkillGuide("Pointers, Dynamic Memory Allocation (malloc/free), Structs, System Calls", "Programiz C & Harvard CS50", "High"));
-        SKILL_RESOURCES.put("sql", new SkillGuide("Relational Modeling, Complex JOINs, Window Functions, Indexing & Aggregations", "W3Schools SQL & Mode Analytics SQL Tutorial", "High"));
-        SKILL_RESOURCES.put("spring boot", new SkillGuide("Inversion of Control (IoC), Spring Data JPA, REST Controllers, Actuator", "spring.io/guides & Baeldung Spring Boot", "High"));
-        SKILL_RESOURCES.put("spring", new SkillGuide("Core Spring Beans, Dependency Injection, AOP, Spring Security", "spring.io/quickstart", "Medium"));
-        SKILL_RESOURCES.put("react", new SkillGuide("Functional Components, Hooks (useState, useEffect), Virtual DOM, Context API", "react.dev (Interactive Official Documentation)", "High"));
-        SKILL_RESOURCES.put("javascript", new SkillGuide("ES6+ Syntax, Promises, Async/Await, Event Loop, DOM Manipulation", "javascript.info & MDN Web Docs", "High"));
-        SKILL_RESOURCES.put("typescript", new SkillGuide("Static Typing, Interfaces, Generics, Type Unions, tsconfig setup", "typescriptlang.org handbook", "Medium"));
-        SKILL_RESOURCES.put("node.js", new SkillGuide("Event-Driven Architecture, Express.js Middleware, RESTful APIs, NPM modules", "nodejs.org guides & FreeCodeCamp Backend", "High"));
-        SKILL_RESOURCES.put("aws", new SkillGuide("EC2 Virtual Servers, S3 Storage, IAM Policies, Lambda Serverless, VPC", "AWS Skill Builder Free Tier & AWS Cloud Practitioner Essentials", "High"));
-        SKILL_RESOURCES.put("docker", new SkillGuide("Containerization, Dockerfile Writing, Image Layering, Multi-stage Builds, Compose", "docker.com 101 Tutorial & Play with Docker", "High"));
-        SKILL_RESOURCES.put("kubernetes", new SkillGuide("Pods, Deployments, Services, ConfigMaps, Ingress Controllers", "kubernetes.io/docs/tutorials", "Medium"));
-        SKILL_RESOURCES.put("cloud", new SkillGuide("Cloud Architecture, High Availability, Scalability, Object Storage", "Google Cloud / AWS Digital Training", "Medium"));
-        SKILL_RESOURCES.put("microservices", new SkillGuide("API Gateways, Service Discovery, Eventual Consistency, Circuit Breakers", "microservices.io & Martin Fowler Microservices Guide", "High"));
-        SKILL_RESOURCES.put("kafka", new SkillGuide("Event Streaming, Producers, Consumers, Topics, Partitioning & Offsets", "Apache Kafka Documentation & Confluent Developer", "Medium"));
-        SKILL_RESOURCES.put("redis", new SkillGuide("In-Memory Caching, Key-Value Structures, Pub/Sub, TTL, Cache Eviction", "redis.io/university & Redis University Free Courses", "Medium"));
-        SKILL_RESOURCES.put("data structures", new SkillGuide("Arrays, LinkedLists, Trees, Graphs, Hash Tables, Big-O Complexity", "NeetCode.io & GeeksforGeeks DSA Self-Paced", "High"));
-        SKILL_RESOURCES.put("algorithms", new SkillGuide("Binary Search, Two Pointers, Dynamic Programming, BFS/DFS Graph Traversal", "LeetCode Curated 75 & Visualgo.net", "High"));
-        SKILL_RESOURCES.put("machine learning", new SkillGuide("Supervised Learning, Regression, Classification, Scikit-Learn, Feature Scaling", "Google Machine Learning Crash Course", "High"));
-        SKILL_RESOURCES.put("power bi", new SkillGuide("Data Transformation with Power Query, DAX Measures, Relational Modeling", "Microsoft Learn: Power BI Fundamentals", "Medium"));
-        SKILL_RESOURCES.put("tableau", new SkillGuide("Calculated Fields, Visual Storytelling, Dashboards, Data Blending", "Tableau Free Training Videos & Tableau Public", "Medium"));
-        SKILL_RESOURCES.put("excel", new SkillGuide("XLOOKUP, INDEX/MATCH, Pivot Tables, Conditional Formatting, Data Cleaning", "Excel Exposure & Chandoo.org", "Medium"));
-        SKILL_RESOURCES.put("linux", new SkillGuide("Bash Shell Scripting, File Permissions, Process Management, Cron Jobs, SSH", "LinuxJourney.com & OverTheWire Bandit", "Medium"));
-        SKILL_RESOURCES.put("git", new SkillGuide("Branching Strategies, Merge vs Rebase, Pull Requests, Resolving Conflicts", "Git-SCM Pro Git Book & GitHub Skills", "High"));
+        SKILL_RESOURCES.put("java", new SkillGuide("Java", "OOP Concepts, Collections, Streams, Multithreading", "dev.java & Mooc.fi", "High", "⭐⭐⭐⭐⭐ High Priority", "OOP", "Collections", "Streams", "Multithreading"));
+        SKILL_RESOURCES.put("python", new SkillGuide("Python", "Data Structures, OOP, List Comprehensions, File I/O, Generators", "docs.python.org", "High", "⭐⭐⭐⭐⭐ High Priority", "Data Structures", "Pandas", "OOP", "Generators"));
+        SKILL_RESOURCES.put("c++", new SkillGuide("C++", "Pointers, Memory Management, STL Containers, Modern C++17", "LearnCpp.com", "High", "⭐⭐⭐⭐⭐ High Priority", "Pointers", "STL", "Memory Management"));
+        SKILL_RESOURCES.put("c", new SkillGuide("C", "Pointers, Dynamic Memory (malloc/free), Structs, System Calls", "Programiz C", "High", "⭐⭐⭐⭐ Essential", "Pointers", "Memory", "Structs"));
+        SKILL_RESOURCES.put("sql", new SkillGuide("SQL", "Relational Modeling, Joins, Window Functions, Indexing", "W3Schools SQL", "High", "⭐⭐⭐⭐⭐ High Priority", "Joins", "Window Functions", "Indexing", "Normalization"));
+        SKILL_RESOURCES.put("spring boot", new SkillGuide("Spring Boot", "REST API, Security, Spring Data JPA, Microservices", "spring.io/guides", "High", "⭐⭐⭐⭐⭐ High Priority", "REST API", "Security", "Spring Data JPA", "Microservices"));
+        SKILL_RESOURCES.put("spring", new SkillGuide("Spring", "Core Spring Beans, Dependency Injection, AOP, Spring Security", "spring.io/quickstart", "Medium", "⭐⭐⭐⭐ Essential", "IoC", "DI", "AOP", "Security"));
+        SKILL_RESOURCES.put("react", new SkillGuide("React", "Hooks, State Management, Virtual DOM, React Router", "react.dev", "High", "⭐⭐⭐⭐⭐ High Priority", "Hooks", "State Management", "Virtual DOM", "Router"));
+        SKILL_RESOURCES.put("javascript", new SkillGuide("JavaScript", "ES6+ Syntax, Promises, Async/Await, Event Loop, DOM", "javascript.info", "High", "⭐⭐⭐⭐⭐ High Priority", "ES6+", "Async/Await", "Event Loop", "DOM"));
+        SKILL_RESOURCES.put("typescript", new SkillGuide("TypeScript", "Static Typing, Interfaces, Generics, Type Unions", "typescriptlang.org", "Medium", "⭐⭐⭐⭐ Essential", "Types", "Interfaces", "Generics"));
+        SKILL_RESOURCES.put("node.js", new SkillGuide("Node.js", "Event Loop, Express.js Middleware, RESTful APIs, NPM", "nodejs.org", "High", "⭐⭐⭐⭐⭐ High Priority", "Express", "REST APIs", "Async"));
+        SKILL_RESOURCES.put("aws", new SkillGuide("AWS", "EC2, S3, IAM Policies, Lambda Serverless, VPC", "AWS Skill Builder", "High", "⭐⭐⭐⭐⭐ High Priority", "EC2", "S3", "IAM", "Lambda"));
+        SKILL_RESOURCES.put("docker", new SkillGuide("Docker", "Containerization, Dockerfile Writing, Image Layering, Compose", "docker.com 101", "High", "⭐⭐⭐⭐⭐ High Priority", "Containers", "Dockerfile", "Multi-Stage", "Compose"));
+        SKILL_RESOURCES.put("kubernetes", new SkillGuide("Kubernetes", "Pods, Deployments, Services, ConfigMaps, Ingress", "kubernetes.io/docs", "Medium", "⭐⭐⭐⭐ Essential", "Pods", "Deployments", "Services"));
+        SKILL_RESOURCES.put("cloud", new SkillGuide("Cloud", "Architecture, High Availability, Scalability, Storage", "Google Cloud / AWS", "Medium", "⭐⭐⭐⭐ Essential", "Scalability", "High Availability"));
+        SKILL_RESOURCES.put("microservices", new SkillGuide("Microservices", "API Gateways, Service Discovery, Sagas, Circuit Breakers", "microservices.io", "High", "⭐⭐⭐⭐⭐ High Priority", "API Gateway", "Service Discovery", "Resilience4j"));
+        SKILL_RESOURCES.put("kafka", new SkillGuide("Kafka", "Event Streaming, Producers, Consumers, Topics, Partitioning", "Apache Kafka Docs", "Medium", "⭐⭐⭐⭐ Essential", "Producers", "Consumers", "Topics"));
+        SKILL_RESOURCES.put("redis", new SkillGuide("Redis", "In-Memory Caching, Key-Value, Pub/Sub, TTL, Eviction", "redis.io", "Medium", "⭐⭐⭐⭐ Essential", "Caching", "Key-Value", "Pub/Sub"));
+        SKILL_RESOURCES.put("data structures", new SkillGuide("DSA", "Arrays, Trees, Graphs, Hash Tables, Dynamic Programming", "NeetCode.io", "High", "⭐⭐⭐⭐⭐ High Priority", "Arrays", "Trees", "Graphs", "DP"));
+        SKILL_RESOURCES.put("algorithms", new SkillGuide("Algorithms", "Binary Search, Two Pointers, Dynamic Programming, BFS/DFS", "LeetCode Curated 75", "High", "⭐⭐⭐⭐⭐ High Priority", "Binary Search", "Two Pointers", "BFS/DFS", "DP"));
+        SKILL_RESOURCES.put("machine learning", new SkillGuide("Machine Learning", "Supervised Learning, Regression, Classification, Scikit-Learn", "Google ML Crash Course", "High", "⭐⭐⭐⭐⭐ High Priority", "Regression", "Classification", "Scikit-Learn"));
+        SKILL_RESOURCES.put("power bi", new SkillGuide("Power BI", "Data Transformation, Power Query, DAX Measures", "Microsoft Learn", "Medium", "⭐⭐⭐ Recommended", "Power Query", "DAX", "Dashboards"));
+        SKILL_RESOURCES.put("tableau", new SkillGuide("Tableau", "Calculated Fields, Visual Storytelling, Dashboards", "Tableau Training", "Medium", "⭐⭐⭐ Recommended", "Calculated Fields", "Dashboards"));
+        SKILL_RESOURCES.put("excel", new SkillGuide("Excel", "XLOOKUP, INDEX/MATCH, Pivot Tables, Data Cleaning", "Excel Exposure", "Medium", "⭐⭐⭐ Recommended", "XLOOKUP", "Pivot Tables", "Cleaning"));
+        SKILL_RESOURCES.put("linux", new SkillGuide("Linux", "Bash Shell Scripting, Permissions, Process Management", "LinuxJourney.com", "Medium", "⭐⭐⭐⭐ Essential", "Bash", "Permissions", "SSH"));
+        SKILL_RESOURCES.put("git", new SkillGuide("Git", "Branching Strategies, Merge vs Rebase, Pull Requests", "Git-SCM Pro Git", "High", "⭐⭐⭐⭐⭐ High Priority", "Branching", "Rebase", "PRs"));
     }
 
     /**
@@ -220,12 +261,8 @@ public class JobMatchingService {
                         job.applyUrl = "#";
                     }
 
-                    // Format Salary with comma separators
-                    job.displaySalary = job.salary;
-                    try {
-                        long salVal = Long.parseLong(job.salary.replaceAll("[^0-9]", ""));
-                        job.displaySalary = String.format("%,d", salVal);
-                    } catch (Exception ignore) {}
+                    // Format Salary into Professional LPA (Feature 1)
+                    job.displaySalary = formatSalaryLpa(job.salary);
 
                     // ========================================================
                     // Phase 2: HARD ELIGIBILITY EVALUATION (Degree & Branch)
@@ -461,12 +498,22 @@ public class JobMatchingService {
                 if (!job.learningResources.contains(guide.resource)) {
                     job.learningResources.add(missing + " → " + guide.resource);
                 }
+                if (guide.stars != null) {
+                    job.learningPriorityStars = guide.stars;
+                }
+                for (String st : guide.subtopics) {
+                    String sub = guide.skill + ": " + st;
+                    if (!job.learningSubtopics.contains(sub)) {
+                        job.learningSubtopics.add(sub);
+                    }
+                }
                 if ("High".equals(guide.priority)) {
                     job.learningPriority = "High Priority";
                 }
             } else {
                 job.recommendedTopics.add(missing + ": Core syntax, API reference & hands-on application");
                 job.learningResources.add(missing + " → Official Documentation & freeCodeCamp");
+                job.learningSubtopics.add(missing + ": Core Fundamentals");
             }
         }
     }
@@ -507,6 +554,8 @@ public class JobMatchingService {
             sb.append("      \"recommendedTopics\": ").append(listToJsonArray(j.recommendedTopics)).append(",\n");
             sb.append("      \"learningResources\": ").append(listToJsonArray(j.learningResources)).append(",\n");
             sb.append("      \"learningPriority\": ").append(escapeJson(j.learningPriority)).append(",\n");
+            sb.append("      \"learningPriorityStars\": ").append(escapeJson(j.learningPriorityStars)).append(",\n");
+            sb.append("      \"learningSubtopics\": ").append(listToJsonArray(j.learningSubtopics)).append(",\n");
             sb.append("      \"matchCount\": ").append(j.matchCount).append(",\n");
             sb.append("      \"matchScore\": ").append(j.matchScore).append(",\n");
             sb.append("      \"matchTierClass\": ").append(escapeJson(j.matchTierClass)).append(",\n");
